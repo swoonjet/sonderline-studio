@@ -1,0 +1,114 @@
+{
+  "id": "d2-site-signals",
+  "title": "Site signals: capability carousel",
+  "request": {
+    "requester": "Brand / social team",
+    "channel": "LinkedIn document carousel, organic",
+    "brief": "A swipeable explainer of what Pulse brings together: site activity, service requests, escalations and team updates. One idea per frame. End on the demo request."
+  },
+  "formats": [
+    "feed"
+  ],
+  "content": {
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "frames": [
+    {
+      "layout": "type-led",
+      "field": "lavender",
+      "flow": true,
+      "flowSeed": 11,
+      "content": {
+        "label": "SONDERLINE PULSE / PRODUCT PERSPECTIVE",
+        "headline": "Site signals.",
+        "lead": "One consolidated view across your locations.",
+        "cta": "Request a Pulse demo."
+      }
+    },
+    {
+      "layout": "signal",
+      "field": "white",
+      "index": "01 / 04",
+      "photo": {
+        "id": "material-study",
+        "focus": [
+          0.12,
+          0.5
+        ],
+        "zoom": 1.6
+      },
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Site activity"
+      }
+    },
+    {
+      "layout": "signal",
+      "field": "lavender",
+      "index": "02 / 04",
+      "photo": {
+        "id": "material-study",
+        "focus": [
+          0.38,
+          0.5
+        ],
+        "zoom": 1.6
+      },
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Service requests"
+      }
+    },
+    {
+      "layout": "signal",
+      "field": "coolgrey",
+      "index": "03 / 04",
+      "photo": {
+        "id": "material-study",
+        "focus": [
+          0.63,
+          0.5
+        ],
+        "zoom": 1.6
+      },
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Escalations"
+      }
+    },
+    {
+      "layout": "signal",
+      "field": "white",
+      "index": "04 / 04",
+      "photo": {
+        "id": "material-study",
+        "focus": [
+          0.88,
+          0.5
+        ],
+        "zoom": 1.6
+      },
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Team updates"
+      }
+    },
+    {
+      "layout": "photo-hero",
+      "photo": null,
+      "flow": true,
+      "flowSeed": 5,
+      "accent": "coolgrey",
+      "content": {
+        "headline": "Keep the details connected.",
+        "label": "SONDERLINE PULSE",
+        "lead": "For organizations managing multiple locations.",
+        "cta": "Request a Pulse demo.",
+        "status_label": "PILOT STATUS",
+        "status": "Early-access pilots planned for Q1 2027."
+      }
+    }
+  ],
+  "caption": "Site signals. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Summary dashboards. Detailed operational views. Weekly digests. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Six-frame carousel. Frame 1: Site signals, one consolidated view across your locations. Frames 2 to 5, over a panning close-up of ribbed brushed metal: Site activity, Service requests, Escalations, Team updates. Frame 6: Keep the details connected, with the demo request and pilot status. Sonderline logo on every frame."
+}

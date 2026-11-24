@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Social System Overview</title>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<header class="bar">
+  <a class="brand" href="../"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="">Sonderline Social System</a>
+  <nav><a href="../">Overview</a><a href="./" aria-current="page">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Open the Studio</a></nav>
+</header>
+
+<div class="hero">
+  <div class="lead">
+    <p class="label">System overview · for Sonderline creative leadership</p>
+    <h1>AI makes the choices. Code places the pixels. People approve.</h1>
+    <p class="big">A repeatable production system for Sonderline's social content. One brief becomes every format, on brand by construction, checked against the guide on the real pixels, and signed off by named people.</p>
+  </div>
+  <aside>
+    <p class="label">On this page</p>
+    <p><a href="#opportunity">1. The opportunity</a><br><a href="#system">2. How the system works</a><br><a href="#tools">3. Tools and integrations</a><br><a href="#quality">4. Human judgment and quality control</a><br><a href="#status">5. What works, what comes next</a><br><a href="#adoption">6. Introducing it to the team</a><br><a href="#impact">7. Impact and limits</a><br><a href="#assumptions">8. Assumptions and sources</a></p>
+  </aside>
+</div>
+
+<section class="block" id="opportunity">
+  <p class="label">1 · The opportunity</p>
+  <h2>Why social content first</h2>
+  <div class="cols">
+    <div><h3>Volume</h3><p>Every message ships in four or more formats (4:5 feed, 1:1, 1.91:1 link card, 9:16 story) and often as a carousel, for product, brand, regional and recruiting teams. It's the highest-volume content type the team makes.</p></div>
+    <div><h3>Where the time goes</h3><p>Most of the hours aren't spent on ideas. They go on adaptation: resizing, re-cropping, re-setting type, re-checking contrast and copy for each format, then fixing whatever slipped through.</p></div>
+    <div><h3>A system worth encoding</h3><p>Sonderline's guide is precise: a fixed grid, five colours, vermilion as a ~3% signal, 4.5:1 contrast and supplied logos with h/2 clearspace. Those rules are easy to drift from by hand and ideal to enforce in code.</p></div>
+    <div><h3>Risk</h3><p>Pulse is pre-launch. The guide is explicit: "Do not invent capabilities, performance numbers or testimonials." Pre-launch, many hands and fast turnaround make claim drift the biggest brand risk in social.</p></div>
+  </div>
+</section>
+
+<section class="block" id="system">
+  <p class="label">2 · How the system works</p>
+  <h2>Seven steps, one source of truth</h2>
+  <p class="prose">AI works where judgment about language and choice helps. Code handles everything that must be exact. People own the decisions that need taste or accountability. Every step reads the same brand rules, so nothing is hard-coded twice.</p>
+  <div class="pipe" role="list">
+    <div class="stage human" role="listitem"><span class="n">01</span><h4>Brief</h4><p>Requester states the goal, audience and channels.</p><p class="tool">Proto: Studio brief panel<br>Prod: Asana / Jira / Airtable form</p></div>
+    <div class="stage ai" role="listitem"><span class="n">02</span><h4>Draft spec</h4><p>Claude picks approved lines, layout, photo, crop and formats, and drafts the caption. Gaps get flagged, never invented.</p><p class="tool">Claude API (Opus 5.5), structured JSON output</p></div>
+    <div class="stage code" role="listitem"><span class="n">03</span><h4>Compose</h4><p>Engine renders every format from the spec: grid, type fitting, balanced line breaks, contrast-solving scrim.</p><p class="tool">Canvas renderer, in the browser + headless Chromium</p></div>
+    <div class="stage code" role="listitem"><span class="n">04</span><h4>Check</h4><p>13 guide rules checked on geometry and real pixels. Pass, review (names who decides) or fail (blocked).</p><p class="tool">Validator, same code everywhere</p></div>
+    <div class="stage human" role="listitem"><span class="n">05</span><h4>Review</h4><p>Designer, brand lead, plus product marketing when copy is new. Overrides stay possible: crop, layout, line choice.</p><p class="tool">Proto: Studio gates<br>Prod: Figma / Frame.io</p></div>
+    <div class="stage code" role="listitem"><span class="n">06</span><h4>Deliver</h4><p>PNG set, caption, alt text, spec, report and approval record travel together.</p><p class="tool">Proto: zip export<br>Prod: DAM → scheduler</p></div>
+    <div class="stage human" role="listitem"><span class="n">07</span><h4>Learn</h4><p>Approved new lines join the library. Frequent overrides become new layout rules.</p><p class="tool">Pull requests to the rules repo</p></div>
+  </div>
+  <div class="source"><b>Brand source of truth</b><span>rules/tokens.json: colours, pairings, type, logo, grid</span><span>rules/copy-library.json: approved copy + blocked patterns</span><span>rules/formats.json: sizes and safe zones</span><span class="muted" style="color:#bbb">Versioned in Git · changes approved by the brand lead</span></div>
+  <div class="legend"><span class="l-ai">AI decides</span><span class="l-code">Code enforces</span><span class="l-human">People approve</span></div>
+</section>
+
+<section class="block" id="tools">
+  <p class="label">3 · Tools and integrations</p>
+  <h2>What I'd run it on</h2>
+  <p class="prose">The prototype needs no paid software. For production I'd plug into tools Sonderline's team already uses rather than adding a new platform.</p>
+  <div class="table-wrap"><table>
+    <tr><th>Job</th><th>Prototype (working today)</th><th>Production recommendation</th><th>Integration</th></tr>
+    <tr><td><b>Intake</b></td><td>Studio brief panel</td><td>The team's request form (Asana, Jira or Airtable)</td><td>Webhook creates a draft job and links back to the ticket</td></tr>
+    <tr><td><b>Brand rules</b></td><td>JSON files in this repo</td><td>Same files in a private Git repo; pull requests approved by the brand lead</td><td>Read at render time by every step. One change updates every output</td></tr>
+    <tr><td><b>Drafting</b></td><td>Claude in the browser with the viewer's own key, plus a rules-based offline drafter</td><td>Claude (Anthropic API) behind a small server, so no keys in browsers. Enterprise data terms; prompts and specs logged</td><td>Structured output validated against the spec schema</td></tr>
+    <tr><td><b>Composition</b></td><td>Canvas engine (browser) and headless Chromium for batch (<code>tools/produce.py</code>)</td><td>Same engine as a render service; optional Figma plugin to open a spec as editable frames</td><td>Spec in, PNGs + geometry out</td></tr>
+    <tr><td><b>Quality checks</b></td><td>Validator with report and on-artwork overlay</td><td>Same validator, posted as a comment in the review tool</td><td>Fails block approval; reviews route to a named role</td></tr>
+    <tr><td><b>Review &amp; approval</b></td><td>Studio gates with names and timestamps; approvals reset if the spec changes</td><td>Figma or Frame.io / Ziflow with SSO identities</td><td>Approval record attached to the asset</td></tr>
+    <tr><td><b>Delivery</b></td><td>Zip: PNGs, caption, alt text, spec, report, approvals</td><td>DAM (Bynder, Brandfolder or AEM Assets) → Sprout Social / Hootsuite / LinkedIn</td><td>Metadata travels with every file</td></tr>
+  </table></div>
+</section>
+
+<section class="block" id="quality">
+  <p class="label">4 · Human judgment and quality control</p>
+  <h2>The checker catches what's measurable. People decide the rest.</h2>
+  <div class="cols">
+    <div>
+      <h3>Checked automatically on every output</h3>
+      <p>Approved on-image copy (p13) · measured text contrast ≥ 4.5:1 (p06) · approved colour pairings (p06) · brand palette only (p03) · vermilion ≤ 5% of pixels (p04) · Inter Tight 400/700 (p05) · fit and collisions (p07) · minimum type size (p05) · supplied logo, undistorted, clearspace kept (p02) · black footer (p07) · story safe zones · photo provenance and enlargement (p08) · assumed assets flagged · caption claims and alt text (p13).</p>
+    </div>
+    <div>
+      <h3>Who decides what</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Role</th><th>When</th><th>Decides</th></tr>
+        <tr><td><b>Requester</b></td><td>Always</td><td>The brief: purpose, audience, channels</td></tr>
+        <tr><td><b>Designer</b></td><td>Always</td><td>Crop, rhythm, whether the image carries the message. Can override layout choices</td></tr>
+        <tr><td><b>Product marketing</b></td><td>When copy isn't in the library</td><td>New lines and anything near a claim or product status</td></tr>
+        <tr><td><b>Brand lead</b></td><td>Always (final)</td><td>Sign-off. Owns the rules and the copy library</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <h3>What I would refine before delivery: one request, three versions</h3>
+  <p class="prose">A regional team asked for a post "leading with escalations" and wrote in the brief that "Pulse cuts escalation response times by 40%." See it on the <a href="../deliverables/#review">deliverables page</a>.</p>
+  <ol class="prose">
+    <li><b>v1, first draft: blocked.</b> White headline on bright metal measured <b>1.39:1</b>. The caption contains an unapproved performance number. The lead "Resolve escalations faster across every store" isn't in the library, so it's routed to product marketing. Nobody can approve it yet.</li>
+    <li><b>v2, auto-fixed: passes, but I wouldn't ship it.</b> Product marketing swaps in approved copy, and the engine solves a 50% scrim to clear contrast. Every check passes, but the metal goes flat and grey. Passing the checks isn't the same as good work.</li>
+    <li><b>v3, designer refined: approved.</b> The designer re-crops each format so the photo's own shadow sits behind the headline: 30% scrim on the feed post, none on the link card. The texture comes back and the type reads cleanly. <b>The designer makes the call; the brand lead approves.</b> Product marketing signed off the copy change in v2.</li>
+  </ol>
+  <p class="prose">That's the division of labour: the system makes the failure impossible to miss and the fix cheap, and the craft decision stays with a person.</p>
+</section>
+
+<section class="block" id="status">
+  <p class="label">5 · What works, what comes next</p>
+  <h2>Functional vs conceptual</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Piece</th><th>Status</th><th>Notes</th></tr>
+    <tr><td><b>Brand rules as data</b> (tokens, copy library, formats)</td><td><span class="status works">Works</span></td><td>Transcribed from Brand Guide 8.0; grid measured from the guide's own social example</td></tr>
+    <tr><td><b>Layout engine</b>: 3 layout families × 4 formats, carousels, per-format crop overrides</td><td><span class="status works">Works</span></td><td>Type fitting, balanced breaks, scrim solved for contrast, safe zones</td></tr>
+    <tr><td><b>Validator</b>: 13 frame checks + caption and alt text</td><td><span class="status works">Works</span></td><td>Same code in the browser and the CLI</td></tr>
+    <tr><td><b>Pulse Social Studio</b> (web app)</td><td><span class="status works">Works</span></td><td>Brief → spec → renders → checks → named approvals → zip export</td></tr>
+    <tr><td><b>Claude drafting</b> (brief → spec)</td><td><span class="status works">Works</span></td><td>Needs an Anthropic API key, pasted into the Studio; without one, the offline rules drafter runs</td></tr>
+    <tr><td><b>Batch CLI</b> (<code>tools/produce.py</code>)</td><td><span class="status works">Works</span></td><td>Produced every deliverable on these pages, with reports</td></tr>
+    <tr><td><b>Intake webhooks, DAM, scheduler, SSO</b></td><td><span class="status concept">Concept</span></td><td>Standard integrations; depends on Sonderline's existing stack</td></tr>
+    <tr><td><b>Server-side drafting + audit log</b></td><td><span class="status concept">Concept</span></td><td>Needed before production: keys must not live in browsers</td></tr>
+    <tr><td><b>Figma round-trip</b></td><td><span class="status concept">Concept</span></td><td>For designers who want to hand-finish a spec</td></tr>
+    <tr><td><b>Learning loop</b> (library updates, override analytics, performance data)</td><td><span class="status concept">Concept</span></td><td>Process plus light tooling</td></tr>
+  </table></div>
+  <h3>Limitations and failure points</h3>
+  <ul class="prose">
+    <li><b>Photography is the bottleneck.</b> Two supplied photos limit variety. A real library needs tagging (mode, safe crops, dark zones). Generated imagery would need its own rules for likeness, provenance and disclosure.</li>
+    <li><b>Implied claims.</b> "Faster" or "smarter" contains no number, so patterns can't block it. The system catches it because it's new copy, and a person decides. That gate must stay.</li>
+    <li><b>Drafting can be wrong or weak.</b> Claude may choose a flat line or a poor crop. The engine and checks contain the damage, and the designer overrides. If the API is down, the offline drafter and hand-edited specs keep work moving.</li>
+    <li><b>Measured isn't perceived.</b> Contrast is measured on the pixels under each text block (98th percentile). Busy textures can still feel worse than they measure, and that's a designer call.</li>
+    <li><b>Template rigidity.</b> New campaign looks need new layout families. That's roughly 1–2 days for a designer and creative technologist each, then they're reusable forever.</li>
+    <li><b>Prototype shortcuts.</b> The API key is in the browser, approvals are typed names rather than SSO, and the zip stands in for a DAM.</li>
+  </ul>
+</section>
+
+<section class="block" id="adoption">
+  <p class="label">6 · Introducing it to the team</p>
+  <h2>Pilot small, keep designers in charge</h2>
+  <div class="cols">
+    <div><h3>Weeks 1–2 · Baseline</h3><p>Time 20 real social requests end to end. Confirm the copy library with product marketing and the rules with the brand lead. Fill the gaps, such as the flow graphics.</p></div>
+    <div><h3>Weeks 3–6 · Pilot</h3><p>One social pod uses the Studio for real requests. Designers keep full override. Review the overrides weekly: each repeated override becomes a rule or a new layout.</p></div>
+    <div><h3>Weeks 7–12 · Scale</h3><p>Connect intake and the DAM, then add presentations and short video on the same engine and rules. Train the wider team in short sessions using their own briefs.</p></div>
+    <div><h3>Ownership</h3><p>The brand lead owns rules and library. Product marketing owns claims. A creative technologist maintains layouts and the engine. Overrides and failures are reviewed monthly.</p></div>
+  </div>
+</section>
+
+<section class="block" id="impact">
+  <p class="label">7 · Expected impact and limits</p>
+  <h2>Capacity, consistency, fewer review rounds</h2>
+  <div class="cols">
+    <div><h3>Time per post set <span class="fine">(assumption)</span></h3><p>Manual: about 3–5 hours to lay out four formats, resize, chase copy and run QA. With the system: about 30–60 minutes to brief, review and approve.</p></div>
+    <div><h3>At volume <span class="fine">(assumption)</span></h3><p>At 50 post sets a month, roughly 120–200 designer hours a month move from adaptation to concept work. That's capacity, not headcount.</p></div>
+    <div><h3>Quality</h3><p>Off-palette colour, low contrast, stretched logos and unapproved claims can't reach review unflagged. Reviewers spend their time on judgment, not policing.</p></div>
+    <div><h3>How we'd prove it</h3><p>Baseline first, then measure: time to publish, review rounds per asset, override rate and check failure rate. These numbers are estimates until Sonderline's own baseline replaces them.</p></div>
+  </div>
+</section>
+
+<section class="block" id="assumptions">
+  <p class="label">8 · Assumptions and sources</p>
+  <div class="cols">
+    <div class="prose">
+      <h3>Assumptions</h3>
+      <ul>
+        <li>Brand Guide 8.0 is the source of truth. Where the kit's notes differ (e.g. a mockup note describing a full vermilion panel), the guide wins.</li>
+        <li><b>Flow graphics were listed in the brief but not supplied.</b> I made a clearly labelled stand-in from the S symbol's slanted bars in the guide's colourways. The checker routes any output that uses it to the brand lead.</li>
+        <li>Approved copy = guide page 13 plus the lines used in the guide's own examples.</li>
+        <li>Format sizes and story safe zones (top 250px, bottom 340px) follow current platform guidance.</li>
+        <li>Volumes and hours are illustrative until baselined.</li>
+      </ul>
+    </div>
+    <div class="prose">
+      <h3>Sources</h3>
+      <ul>
+        <li>Sonderline Brand Guide 8.0 and brand kit, supplied by SketchDeck.</li>
+        <li>Photography: the two supplied images. They are fictional and AI-generated per the kit's notes; no other imagery was used.</li>
+        <li>Inter Tight by Rasmus Andersson, SIL Open Font License 1.1 (supplied).</li>
+        <li>JSZip 3.10.1 (MIT) for the Studio's zip export.</li>
+        <li>Built with Claude (Anthropic) as a coding partner. The drafting step runs on Claude Opus 5.5.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">Prepared by Jon Toews for SketchDeck's Director of AI Solutions exercise · November 2026 · Sonderline is a fictional brand.</footer>
+</body>
+</html>

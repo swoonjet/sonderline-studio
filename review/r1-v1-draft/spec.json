@@ -1,0 +1,35 @@
+{
+  "id": "r1-v1-draft",
+  "title": "Review example, v1: first draft before review",
+  "request": {
+    "requester": "Regional marketing (retail)",
+    "channel": "LinkedIn organic: feed + link card",
+    "brief": "Reach facilities directors at retail chains. Lead with escalations: our sales team says Pulse cuts escalation response times by 40%. Use the metal photo, keep it bright and premium."
+  },
+  "layout": "photo-hero",
+  "formats": [
+    "feed",
+    "link"
+  ],
+  "photo": {
+    "id": "material-study",
+    "focus": [
+      0.85,
+      0.12
+    ],
+    "zoom": 1
+  },
+  "scrim": "off",
+  "accent": "lavender",
+  "content": {
+    "headline": "Every site. One view.",
+    "label": "SONDERLINE PULSE",
+    "lead": "Resolve escalations faster across every store.",
+    "cta": "Request a Pulse demo.",
+    "status_label": "EARLY ACCESS",
+    "status": "Pilots planned for Q1 2027.",
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "caption": "Every site. One view. Pulse cuts escalation response times by 40% across retail chains. Request a Pulse demo.",
+  "alt": "Close-up of ribbed brushed metal. Headline: Every site. One view. Resolve escalations faster across every store. Request a Pulse demo. Early access: pilots planned for Q1 2027. Sonderline logo."
+}

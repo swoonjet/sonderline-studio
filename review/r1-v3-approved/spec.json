@@ -1,0 +1,44 @@
+{
+  "id": "r1-v3-approved",
+  "title": "Review example, v3: designer refined, approved",
+  "request": {
+    "requester": "Regional marketing (retail)",
+    "channel": "LinkedIn organic: feed + link card",
+    "brief": "Reach facilities directors at retail chains. Lead with escalations: our sales team says Pulse cuts escalation response times by 40%. Use the metal photo, keep it bright and premium."
+  },
+  "layout": "photo-hero",
+  "formats": [
+    "feed",
+    "link"
+  ],
+  "photo": {
+    "id": "material-study",
+    "focus": [
+      0.3,
+      0.8
+    ],
+    "zoom": 1.25
+  },
+  "scrim": "auto",
+  "accent": "lavender",
+  "content": {
+    "headline": "Every site. One view.",
+    "label": "SONDERLINE PULSE",
+    "lead": "A clearer view across every location.",
+    "cta": "Request a Pulse demo.",
+    "status_label": "EARLY ACCESS",
+    "status": "Pilots planned for Q1 2027.",
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "caption": "Every site. One view. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. It is for organizations managing multiple locations. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Close-up of ribbed brushed metal with a dark curved shadow. Headline: Every site. One view. A clearer view across every location. Request a Pulse demo. Early access: pilots planned for Q1 2027. Sonderline logo.",
+  "photoOverrides": {
+    "feed": {
+      "focus": [
+        0.05,
+        0.9
+      ],
+      "zoom": 2
+    }
+  }
+}
