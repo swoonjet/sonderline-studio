@@ -186,15 +186,16 @@ export class Renderer {
     const punch = calm ? 0 : (o.punch ?? 1);
     // the whole field, including the raised side of the step, stays inside r
     const rise = 2.2 + 0.35 * punch;
-    const pitch = r.h / (n + rise), t = Math.max(calm ? 2 : 1.2, pitch * (o.weight ?? 0.42));
+    // calm cards are seen small in feeds: heavier lines and wider spacing so they don't alias when scaled down
+    const pitch = r.h / (n + rise), t = calm ? Math.max(0.0075 * u, pitch * (o.weight ?? 0.34)) : Math.max(1.2, pitch * (o.weight ?? 0.42));
     const dy = -pitch * (2.2 + 0.35 * pulse * punch);
     let xs;
-    if (calm) xs = r.x + r.w * ((o.stepAt ?? 0.62) + 0.015 * Math.sin((o.time ?? 0) * 0.35));
+    if (calm) xs = r.x + r.w * (o.stepAt ?? 0.62);              // fixed: a moving step makes edges crawl
     else {
       const travel = ((o.time ?? 0) * (o.speed ?? 0.06)) % 1;
       xs = r.x + r.w * (0.25 + 0.5 * (0.5 - 0.5 * Math.cos(travel * Math.PI * 2)));
     }
-    const w = r.w * (o.run ?? (calm ? 0.2 : 0.24));
+    const w = r.w * (o.run ?? (calm ? 0.34 : 0.24));        // gentler step on cards: steep thin diagonals alias
     const reveal = Math.min(1, Math.max(0, o.reveal ?? 1));
     const ease = calm
       ? x => { const k = Math.min(1, Math.max(0, x)); return k * k * k * (k * (k * 6 - 15) + 10); }   // smootherstep
@@ -210,7 +211,7 @@ export class Renderer {
     ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.lineWidth = t;
     for (let i = 0; i < n; i++) {
       const base = r.y + (rise + i + 0.5) * pitch;
-      const shift = i * r.w * (calm ? 0.004 : 0.006);
+      const shift = i * r.w * (calm ? 0.01 : 0.006);
       ctx.beginPath();
       for (let x = r.x; x <= r.x + r.w + step; x += step) {
         const y = base + dy * ease((x - (xs + shift - w / 2)) / w);
@@ -258,8 +259,8 @@ export class Renderer {
     // motion: in video, Contour is drawn as a smooth field that flows and breathes with the beat
     const anim = this.frame.flowAnim;
     if (anim && style === 'contour') {
-      const lines = Math.max(6, Math.min(11, Math.round(r.h / (0.042 * this.u))));
-      return this.contourField(r, { color: cw.bars, alpha: 1, weight: 0.3, lines, time: anim.time ?? 0, beat: anim.beat ?? 0, reveal: anim.progress, calm: true });
+      const lines = Math.max(4, Math.min(8, Math.round(r.h / (0.06 * this.u))));
+      return this.contourField(r, { color: cw.bars, alpha: 1, weight: 0.34, lines, time: anim.time ?? 0, beat: anim.beat ?? 0, reveal: anim.progress, calm: true });
     }
     const drawW = anim ? r.w * Math.min(1, Math.max(0, anim.progress)) : r.w;
     const shift = anim ? (anim.phase - 0.5) * 0.22 * r.w : 0;
