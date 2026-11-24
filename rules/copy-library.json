@@ -1,0 +1,45 @@
+{
+  "_about": "Approved source copy for Sonderline Pulse, transcribed verbatim from Brand Guide 8.0 (pages 01, 05, 09-13). Anything that is not here is NEW COPY and must pass human review before use. Guide p13: do not invent capabilities, performance numbers or testimonials.",
+  "source": "Sonderline_Brand_Guide.pdf v8.0",
+  "voice": ["Straightforward.", "Human.", "Useful."],
+  "product": {
+    "name": "Sonderline Pulse",
+    "description": "Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates.",
+    "audience": "It is for organizations managing multiple locations.",
+    "capabilities": ["Summary dashboards.", "Detailed operational views.", "Weekly digests."],
+    "signals": ["Site activity", "Service requests", "Escalations", "Team updates"],
+    "status": "Early-access pilots planned for Q1 2027.",
+    "cta": "Request a Pulse demo."
+  },
+  "lines": [
+    {"id": "progress-in-view", "text": "Progress, in view.", "role": "headline", "page": 1},
+    {"id": "every-site", "text": "Every site. One view.", "role": "headline", "page": 1},
+    {"id": "clearer-view-every-location", "text": "A clearer view across every location.", "role": "lead", "page": 1},
+    {"id": "clearer-view-locations", "text": "A clearer view across locations.", "role": "lead", "page": 9},
+    {"id": "clearer-view", "text": "A clearer view.", "role": "headline", "page": 10},
+    {"id": "across-every-location", "text": "Across every location.", "role": "lead", "page": 5},
+    {"id": "operations-perspective-title", "text": "The operations perspective.", "role": "headline", "page": 10},
+    {"id": "for-organizations", "text": "For organizations managing multiple locations.", "role": "lead", "page": 10},
+    {"id": "one-consolidated-view", "text": "One consolidated view of operations across multiple locations.", "role": "body", "page": 5},
+    {"id": "consolidated-your-locations", "text": "One consolidated view across your locations.", "role": "lead", "page": 11},
+    {"id": "site-signals", "text": "Site signals.", "role": "headline", "page": 11},
+    {"id": "details-connected", "text": "Keep the details connected.", "role": "headline", "page": 12},
+    {"id": "operational-view", "text": "Site activity. Service requests. Escalations. Team updates.", "role": "body", "page": 12},
+    {"id": "meet-pulse", "text": "Meet Pulse.", "role": "headline", "page": 12},
+    {"id": "pilots-planned", "text": "Pilots planned for Q1 2027.", "role": "status", "page": 9},
+    {"id": "early-access-pilots", "text": "Early-access pilots planned for Q1 2027.", "role": "status", "page": 1},
+    {"id": "cta-demo", "text": "Request a Pulse demo.", "role": "cta", "page": 1}
+  ],
+  "labels": [
+    "SONDERLINE PULSE", "SONDERLINE / PULSE", "OPERATIONS / PERSPECTIVE", "EARLY ACCESS", "PILOT STATUS",
+    "PRODUCT CAPABILITIES", "CAPABILITIES", "THE OPERATIONAL VIEW", "SONDERLINE PULSE / OVERVIEW",
+    "SONDERLINE PULSE / PRODUCT PERSPECTIVE"
+  ],
+  "forbidden_patterns": [
+    {"pattern": "\\d+\\s?%", "reason": "performance number"},
+    {"pattern": "\\b\\d+x\\b", "reason": "performance multiplier"},
+    {"pattern": "(?i)\\b(customers?|clients?) (say|love|trust)", "reason": "testimonial / social proof"},
+    {"pattern": "(?i)\\b(AI|predict|automat|real-time|integrat)", "reason": "capability not in approved copy"},
+    {"pattern": "(?i)\\b(available now|launch(ed|ing)? today|generally available|GA)\\b", "reason": "contradicts product status (pilots Q1 2027)"}
+  ]
+}

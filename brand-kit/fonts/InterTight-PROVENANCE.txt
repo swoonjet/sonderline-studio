@@ -1,0 +1,10 @@
+Inter Tight - font provenance
+
+Designer: Rasmus Andersson.
+Copyright 2022 The Inter Project Authors (https://github.com/rsms/inter-tight).
+License: SIL Open Font License 1.1; see InterTight-OFL.txt.
+Google Fonts source: https://github.com/google/fonts/tree/0b58fb370093f9a9f4ff785d94405710b79de67c/ofl/intertight
+Upstream source commit from official metadata: c194f94c60b569b47876811321f5ef1f0c2614a2 (rsms/inter-gf-tight).
+Regular 400 and Bold 700 were instantiated from the official InterTight[wght].ttf with fontTools 4.61.1, updateFontNames=True.
+No horizontal scaling, simulated condensation, or substitution was applied.
+Original variable font, metadata, licence, source URLs and SHA-256 values are preserved in InterTight-source/.

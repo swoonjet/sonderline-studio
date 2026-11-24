@@ -1,0 +1,57 @@
+SONDERLINE — PHOTOGRAPHY SOURCES
+
+These are fictional AI-generated editorial images created for the Sonderline candidate exercise. They do not document a real customer, product, workplace or performance result and must not be used as customer evidence.
+
+Generation method: built-in imagegen.
+Generated: 23 November 2026.
+Both supplied images: 1536 × 1024 pixels, RGB.
+
+1. motion-study.png
+Original generated file: exec-90c81bf2-0c1e-41fd-8858-f061c63f2bce.png
+Exact generation prompt:
+Use case: photorealistic-natural. Asset type: photographic source image for a premium editorial brand, wide landscape 3:2. Create an original atmospheric motion photograph of one anonymous person crossing a modern glass-and-metal urban transit concourse. Camera very close, the person's black coat and shoulder pass through the left third, face fully indistinct and outside the readable plane. Convincing lateral camera-pan blur sweeps silver architecture and a pale reflection horizontally, tactile fine photographic grain. Rich black, luminous silver, white and cool grey with only the faintest lavender reflected light. One or two dominant forms, strong graphic rhythm, lighter quiet region on the right. Observational art-book fashion/architecture photography, slow shutter, unposed movement, authentic natural daylight. Photograph fills frame. No text, logos, watermarks, grids, poster frames, illustration, CGI, colored neon, tablet, office posing, smiling corporate stock aesthetic, or recognizable face.
+
+2. material-study.png
+Original generated file: exec-b3b5a0b2-6c2c-4c98-9e01-4b43d0a8d24b.png
+Exact generation prompt:
+Use case: photorealistic-natural. Asset type: original architectural material photograph for a premium editorial brand, wide landscape 3:2. Extreme close crop of real brushed aluminium architecture: a finely ribbed silver metal sheet bends gently across the frame, with a single broad curved almost-black shadow crossing its lower-left portion. The surface has minute tactile grain, slight real-world patina and dense crisp parallel ridges. Directional natural daylight creates silver-white highlights and deep charcoal shadow. Graphic yet believable photographic abstraction, art-book material study, monochrome cool silver/grey/black/white. No object fully visible, no product silhouette, no gadgets. Enough pale silver negative area in the upper right for later editorial cropping. Photograph fills frame. No text, logos, watermarks, grid, mockup, shoe, recognizable branded object, CGI, glossy tech render, artificial rainbow reflections or graphic-design overlay.
+
+3. Historical context mockup (superseded by item 4)
+Fictional AI-generated physical mockup, created with built-in imagegen using the supplied Sonderline poster as the exact artwork reference. It does not document a real placement, office or customer.
+Original generated file: exec-ffa08b38-921c-4c44-a403-f7c234a3f373.png
+Source artwork: poster-mockup-source.png, rendered from the native Sonderline guide PDF.
+Exact generation prompt:
+Use case: product-mockup. Input image 1 is the exact finished poster artwork to mount in the scene; it is not a loose style reference. Create a realistic physical mockup of this portrait 4:5 poster in a slim black metal frame mounted in a quiet architectural transit or office passage. Landscape 3:2 photograph with generous environment surrounding the frame. Brushed silver wall and large matte grey concrete panels, soft natural side light. Mostly straight-on camera with only slight perspective. Show the entire framed poster, undistorted, fully legible, with frame edges not covering any artwork. Preserve the exact supplied artwork: its image crop, every line of typography and wording, font shapes, all proportions, filled two-piece logo and wordmark, lavender tile, black and white fields, and thin grid hairlines. Exact main text is 'Every site. One view.' Other text must remain exactly as in the reference, including 'SONDERLINE / PULSE', 'A clearer view across locations.', 'Request a Pulse demo.', 'EARLY-ACCESS PILOTS', 'PLANNED FOR Q1 2027' and 'Sonderline'. Do not redesign or reinterpret the poster. Quiet premium architectural photography, subtle plausible reflections on glass with crisp poster legibility. No extra text or logos, no people in the surrounding scene, no billboard glow, no extreme perspective, no border covering edges, no additional props.
+
+
+4. Historical revised mockup (superseded by item 5)
+Generated: 23 November 2026, using built-in imagegen editing.
+Current source: exec-986c9bdf-8e65-48fb-a3ed-adda2f96a948.png
+Inputs: the previous architectural mockup and assets/applications/social_portrait.png.
+This is a fictional context visual, not a production-artwork proof. All copy and brand elements match the revised social artwork; the generated physical rendering slightly varies the poster's section proportions. Use social_portrait.png for the exact artwork.
+Initial edit prompt:
+Use case: compositing. Asset type: photorealistic brand-in-use poster mockup.
+Image 1 is the edit target: a black framed poster on a brushed-metal wall in a concrete-and-glass architectural passage. Image 2 is the exact new poster artwork to insert.
+Replace ONLY the printed poster content inside the existing black frame in image 1 with the COMPLETE artwork from image 2. Treat image 2 as finished graphic artwork, not as a style reference: preserve its exact crop, proportions, composition, typography, text, logo, letter shapes, clear space, colour blocks, photo, colours and spacing. Fit the whole artwork into the existing frame with no content cut off. Retain the target scene's camera, framing, perspective, black metal frame, wall, ceiling, floor, glass and concrete architecture, natural lighting and subtle glass reflections unchanged.
+The new artwork has a large monochrome motion photograph and white headline 'Every site.' then 'One view.'; beneath it a white block (left two-thirds) reading 'SONDERLINE PULSE', 'A clearer view across locations.', 'Request a Pulse demo.' and a thin arrow; a lavender block (right third) reads 'EARLY ACCESS', 'Pilots planned for Q1 2027.'; a single full-width black footer reads 'OPERATIONS / PERSPECTIVE' at left and carries the supplied white exact filled two-piece S symbol and Sonderline wordmark at right. Copy these as part of the provided artwork; do not restyle or regenerate them.
+No visible layout grid lines, no additional type, no people in the architecture, no extra symbols, no partial or oversized logo, no remnants of the previous poster. Keep the photograph believable and the new poster artwork crisp and legible. Maintain the landscape composition of image 1, about 1536 by 1024.
+
+Targeted correction prompt:
+Use case: compositing. Image 1 is the photorealistic mockup to correct; image 2 is the exact finished poster artwork.
+Preserve the entirety of image 1, including architecture, frame, reflections, camera and composition. Correct ONLY the proportions of the graphic printed inside the frame so it matches image 2 exactly. Replace the full inner poster with a flat projection of image 2. Do not reinterpret the layout or type. The upper photo panel must occupy exactly 58.6667% of the inner poster height. The white/lavender information row starts at 58.6667% and ends at 86.6667% of the inner poster height. The single black footer is exactly the bottom 13.3333%. The information row divides at two thirds of the inner poster width: white occupies 66.6667%, lavender occupies 33.3333%. Use those same section boundaries, internal padding, headline scale, type placement and logo scale as image 2. Copy the finished supplied image as printed art; there is no design discretion here. Preserve every supplied word exactly: Every site. / One view. / SONDERLINE PULSE / A clearer view across locations. / Request a Pulse demo. / EARLY ACCESS / Pilots planned for Q1 2027. / OPERATIONS / PERSPECTIVE / Sonderline. Preserve exact supplied two-piece S symbol. No extra grid lines, borders, logos, lettering or content crops. Nothing outside the inner poster may change. Landscape output same aspect ratio as image 1.
+
+
+
+5. Current accessible-colour ../mockups/poster-in-context.png (supersedes item 4)
+Generated: 23 November 2026, using built-in imagegen editing.
+Current source: exec-02b249ff-e6b2-4246-a756-3253abb44940.png
+Inputs: the previous architectural mockup and current assets/applications/social_portrait.png.
+The poster now uses the vermilion early-access panel with black type and the smoothly darkened photographic headline area. This is an illustrative physical context visual, not a production-artwork proof; use social_portrait.png for exact typography, proportions, colours and measured contrast.
+Exact edit prompt:
+Use case: compositing.
+Asset type: photorealistic Sonderline poster mockup.
+Image 1 is the edit target: the existing black-framed poster in a brushed-metal, concrete-and-glass architectural passage. Image 2 is the exact finished replacement poster artwork.
+Replace ONLY the printed content inside the black frame in image 1 with the complete artwork from image 2. Preserve the camera, frame, wall, floor, glass, architecture, natural lighting, and composition exactly. The art is finished: copy its type, spacing, proportions, complete filled two-piece S symbol and wordmark, photograph crop, arrow and all wording. Do not redesign it.
+The updated artwork has a smoothly darkened photographic area behind the large white 'Every site.' / 'One view.' headline. Preserve this darker backing and its smooth fade, with strong white text contrast; no new hard seam in the photo. The early-access panel is now saturated vermilion #FE3C18 with solid black text, NOT lavender. The rest of the information row stays white with black type, and the entire bottom footer remains black with the supplied white logo.
+Preserve these exact words from the artwork: 'Every site.' 'One view.' 'SONDERLINE PULSE' 'A clearer view across locations.' 'Request a Pulse demo.' 'EARLY ACCESS' 'Pilots planned for Q1 2027.' 'OPERATIONS / PERSPECTIVE' 'Sonderline'.
+Preserve complete artwork: the photograph occupies 58.6667% of inner poster height, the white/vermilion information row occupies the next 28%, and the full-width black footer occupies the bottom 13.3333%. The information row splits at two thirds of the inner poster width, white left and vermilion right. No cropped content, no new grid lines, no added wording, no people or extra objects, no geometric logo changes. Keep subtle realistic reflections that do not obscure the words. Landscape image, same aspect ratio as input 1.
