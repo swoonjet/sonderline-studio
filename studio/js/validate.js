@@ -195,7 +195,9 @@ export function validateFrame(result, canvas, brand) {
 export function validateSpecCopy(spec, brand) {
   const checks = [];
   const approved = approvedSet(brand.copy);
-  if (spec.caption) {
+  if (spec.formats?.every(f => f === 'slide')) {
+    // presentations carry no post caption
+  } else if (spec.caption) {
     const res = copyUnits(spec.caption, approved).map(s => ({ s, r: checkCopy(s, brand.copy, approved) }));
     const bad = res.filter(x => x.r.status === 'fail'), rev = res.filter(x => x.r.status === 'review');
     checks.push({

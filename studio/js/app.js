@@ -16,7 +16,7 @@ const el = (tag, attrs = {}, ...kids) => {
   return n;
 };
 const ICON = { pass: '✓', review: '!', fail: '✕' };
-const FORMAT_KEYS = ['feed', 'square', 'link', 'story'];
+const FORMAT_KEYS = ['feed', 'square', 'link', 'story', 'slide'];
 
 let brand, spec, approved;
 let frameSel = 0, outputs = [], sel = 0, approvals = {}, approvedHash = null;
@@ -74,6 +74,10 @@ const CONTENT_FIELDS = {
   'photo-hero': [['headline', 'Headline', 'dl-lines'], ['label', 'Label', 'dl-labels'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines'], ['status_label', 'Status label', 'dl-labels'], ['status', 'Status', 'dl-lines']],
   'type-led': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines']],
   'signal': [['label', 'Label', 'dl-labels'], ['signal', 'Signal', 'dl-signals']],
+  'signal-grid': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines']],
+  'scene-context': [['headline', 'Headline', 'dl-lines']],
+  'scene-story': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['status_label', 'Panel label', 'dl-labels'], ['lead', 'Panel text', 'dl-lines']],
+  'scene-invite': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['cta', 'Call to action', 'dl-lines'], ['status', 'Status', 'dl-lines']],
 };
 
 function target() { return spec.frames ? spec.frames[frameSel] : spec; }
@@ -111,7 +115,7 @@ function buildForm() {
   const footVal = spec.content?.footer_label ?? '';
   form.append(el('label', {}, 'Footer label', el('input', { list: 'dl-labels', value: footVal, oninput: e => { spec.content ||= {}; spec.content.footer_label = e.target.value; changed(); } })));
 
-  if (layout !== 'type-led') {
+  if (!['type-led', 'signal-grid', 'scene-invite'].includes(layout)) {
     const ph = t.photo === undefined ? spec.photo : t.photo;
     form.append(el('label', {}, 'Photo', el('select', {
       onchange: e => { t.photo = e.target.value ? { id: e.target.value, focus: [0.5, 0.5], zoom: 1 } : null; changed(true); },
@@ -137,7 +141,7 @@ function buildForm() {
     const ac = t.accent ?? spec.accent ?? 'lavender';
     form.append(el('label', {}, 'Accent panel', el('select', { onchange: e => { t.accent = e.target.value; changed(); } },
       ['lavender', 'coolgrey'].map(v => el('option', { value: v, selected: ac === v }, v)))));
-  } else {
+  } else if (['type-led', 'signal'].includes(layout)) {
     const fv = t.field ?? 'white';
     form.append(el('label', {}, 'Field colour', el('select', { onchange: e => { t.field = e.target.value; changed(); } },
       ['white', 'lavender', 'coolgrey'].map(v => el('option', { value: v, selected: fv === v }, v)))));

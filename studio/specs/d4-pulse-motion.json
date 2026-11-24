@@ -1,0 +1,24 @@
+{
+  "id": "d4-pulse-motion",
+  "title": "Pulse in motion: 10-second feed video",
+  "request": {
+    "requester": "Brand / social team",
+    "channel": "LinkedIn + Instagram feed video, 4:5",
+    "brief": "Turn the motion storyboard into a short feed video: context, product story, invitation. Type steady, imagery moving."
+  },
+  "formats": ["feed"],
+  "fps": 30,
+  "content": { "footer_label": "OPERATIONS / PERSPECTIVE" },
+  "frames": [
+    { "layout": "scene-context", "footerIndex": "01", "dur": 3.5,
+      "photo": { "id": "motion-study", "focus": [0.12, 0.5], "zoom": 1.35 }, "pan": [[0.12, 0.5], [0.5, 0.5]],
+      "content": { "headline": "Every site. One view." } },
+    { "layout": "scene-story", "footerIndex": "02", "dur": 3.5,
+      "photo": { "id": "material-study", "focus": [0.15, 0.6], "zoom": 1.5 }, "pan": [[0.15, 0.6], [0.6, 0.45]],
+      "content": { "label": "SONDERLINE PULSE", "headline": "Keep the details connected.", "status_label": "THE OPERATIONAL VIEW", "lead": "Site activity. Service requests. Escalations. Team updates." } },
+    { "layout": "scene-invite", "footerIndex": "03", "dur": 3.0,
+      "content": { "label": "SONDERLINE PULSE", "headline": "Meet Pulse.", "cta": "Request a Pulse demo.", "status": "Early-access pilots planned for Q1 2027." } }
+  ],
+  "caption": "Every site. One view. Keep the details connected. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Meet Pulse. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Ten-second video in three scenes. A blurred figure crosses a glass concourse: Every site. One view. Brushed metal pans past: Keep the details connected. Site activity, service requests, escalations, team updates. Lavender end card: Meet Pulse. Request a Pulse demo. Early-access pilots planned for Q1 2027."
+}

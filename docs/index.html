@@ -104,11 +104,12 @@
   <div class="table-wrap"><table>
     <tr><th>Piece</th><th>Status</th><th>Notes</th></tr>
     <tr><td><b>Brand rules as data</b> (tokens, copy library, formats)</td><td><span class="status works">Works</span></td><td>Transcribed from Brand Guide 8.0; grid measured from the guide's own social example</td></tr>
-    <tr><td><b>Layout engine</b>: 3 layout families × 4 formats, carousels, per-format crop overrides</td><td><span class="status works">Works</span></td><td>Type fitting, balanced breaks, scrim solved for contrast, safe zones</td></tr>
+    <tr><td><b>Layout engine</b>: 3 social layout families × 4 formats, carousels, per-format crop overrides</td><td><span class="status works">Works</span></td><td>Type fitting, balanced breaks, scrim solved for contrast, safe zones</td></tr>
+    <tr><td><b>Stretch: presentations and video</b> on the same engine (16:9 slide grid, 3 storyboard scenes → MP4)</td><td><span class="status works">Works</span></td><td>Slides export as PNG/PDF (editable PPTX is next). Video is built from stills, with no sound</td></tr>
     <tr><td><b>Validator</b>: 13 frame checks + caption and alt text</td><td><span class="status works">Works</span></td><td>Same code in the browser and the CLI</td></tr>
     <tr><td><b>Pulse Social Studio</b> (web app)</td><td><span class="status works">Works</span></td><td>Brief → spec → renders → checks → named approvals → zip export</td></tr>
     <tr><td><b>Claude drafting</b> (brief → spec)</td><td><span class="status works">Works</span></td><td>Needs an Anthropic API key, pasted into the Studio; without one, the offline rules drafter runs</td></tr>
-    <tr><td><b>Batch CLI</b> (<code>tools/produce.py</code>)</td><td><span class="status works">Works</span></td><td>Produced every deliverable on these pages, with reports</td></tr>
+    <tr><td><b>Batch CLI</b> (<code>tools/produce.py</code>, <code>tools/produce_video.py</code>)</td><td><span class="status works">Works</span></td><td>Produced every deliverable on these pages, with reports</td></tr>
     <tr><td><b>Intake webhooks, DAM, scheduler, SSO</b></td><td><span class="status concept">Concept</span></td><td>Standard integrations; depends on Sonderline's existing stack</td></tr>
     <tr><td><b>Server-side drafting + audit log</b></td><td><span class="status concept">Concept</span></td><td>Needed before production: keys must not live in browsers</td></tr>
     <tr><td><b>Figma round-trip</b></td><td><span class="status concept">Concept</span></td><td>For designers who want to hand-finish a spec</td></tr>

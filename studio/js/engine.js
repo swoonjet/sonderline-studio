@@ -250,10 +250,11 @@ class Renderer {
     const Lh = Math.min(0.104 * u, ch * 0.92);
     const visRight = W - m;
     this.logo('lockup_white', visRight - (Lh * this.brand.tokens.logo.aspect.lockup - Lh / 4), y0 + ch / 2 - Lh / 2, Lh);
-    const lab = this.frame.content.footer_label;
+    const sys = this.frame.footerIndex;
+    const lab = sys || this.frame.content.footer_label;
     if (lab) {
       const size = Math.round(0.0167 * u);
-      this.text({ role: 'footer_label', text: lab, x: m, y: y0 + ch / 2 - size * CAP / 2, size, color: 'white', on: 'black' });
+      this.text({ role: 'footer_label', text: lab, system: !!sys, x: m, y: y0 + ch / 2 - size * CAP / 2, size, color: 'white', on: 'black' });
     }
   }
 
@@ -412,6 +413,89 @@ const LAYOUTS = {
       if (cur) R.rule(m, y0 + i * step + (size * CAP - mk) / 2, mk, mk);
       R.text({ role: 'list', text: it, x: m + mk + 0.02 * u, y: y0 + i * step, size, weight: cur ? 700 : 400, color: 'black', on: fieldKey });
     });
+    R.footer(yF);
+  },
+
+  // Guide p11: presentation information slide. Lavender lead panel, 2x2 signal tiles,
+  // capabilities line, logo in a reserved footer.
+  'signal-grid'(R) {
+    const { W, H, u, m, frame } = R;
+    const c = frame.content;
+    const yF = Math.round(H * 0.86);
+    const lw = Math.round(W * 0.34), rw = Math.max(4, Math.round(0.0146 * u));
+    R.field('white', 0, 0, W, yF);
+    R.field('lavender', 0, 0, lw, yF);
+    R.rule(0, 0, Math.round(lw * 0.25), rw);
+    const lab = Math.round(0.0167 * u);
+    if (c.label) R.text({ role: 'label', text: c.label, x: lw + m, y: Math.round(1.1 * m), size: lab, color: 'black', on: 'white' });
+    R.text({ role: 'headline', text: c.headline, x: m, y: Math.round(1.6 * m), size: 0.11 * u, min: 0.05 * u, maxW: lw - 2 * m, maxLines: 3, ls: -0.025, lh: 0.95, color: 'black', on: 'lavender' });
+    const ctaSize = Math.round(0.027 * u), arrowLen = Math.round(0.045 * u);
+    const ctaTop = yF - m - ctaSize * CAP;
+    if (c.lead) {
+      const lf = R.fit(c.lead, { size: 0.034 * u, min: 0.022 * u, maxW: lw - 2 * m, maxLines: 3, ls: -0.005 });
+      R.text({ role: 'lead', text: c.lead, x: m, y: ctaTop - 0.12 * u - (lf.lines.length - 1) * lf.size * 1.12, size: lf.size, lines: lf.lines, color: 'black', on: 'lavender', maxLines: 3 });
+    }
+    if (c.cta) { R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: 'lavender' }); R.arrow(lw - m, ctaTop + ctaSize * CAP / 2, arrowLen); }
+    const capSize = Math.round(0.024 * u);
+    const capY = yF - m - capSize * CAP;                       // capability line (cap top)
+    const capLabelY = capY - 0.03 * u - lab * CAP;              // CAPABILITIES label
+    const gx = lw, gy = Math.round(2.4 * m) + lab, gw = W - lw, gh = Math.round(capLabelY - 0.045 * u - gy);
+    const tiles = R.brand.copy.product.signals, fills = ['white', 'lavender', 'coolgrey', 'white'];
+    tiles.forEach((t, i) => {
+      const x = gx + (i % 2) * gw / 2, y = gy + Math.floor(i / 2) * gh / 2;
+      R.field(fills[i], x, y, gw / 2, gh / 2);
+      R.text({ role: 'tile', text: t, x: x + m, y: y + m, size: 0.07 * u, min: 0.04 * u, maxW: gw / 2 - 2 * m, maxLines: 2, ls: -0.02, lh: 0.98, color: 'black', on: fills[i] });
+    });
+    R.text({ role: 'label', text: 'CAPABILITIES', x: lw + m, y: capLabelY, size: lab, color: 'black', on: 'white' });
+    let x = lw + m;
+    R.brand.copy.product.capabilities.forEach(cap => {
+      const b = R.text({ role: 'capability', text: cap, x, y: capY, size: capSize, color: 'black', on: 'white' });
+      x = b.x + b.w + 0.035 * u;
+    });
+    R.footer(yF);
+  },
+
+  // Motion storyboard (guide p12), scene 01 / Context: photo above, statement on lavender.
+  'scene-context'(R) {
+    const { W, H, u, m, frame } = R;
+    const yF = Math.round(H * 0.875), yP = Math.round(H * 0.6);
+    if (frame.photo) R.photo(frame.photo, { x: 0, y: 0, w: W, h: yP });
+    R.field('lavender', 0, yP, W, yF - yP);
+    R.text({ role: 'headline', text: frame.content.headline, x: m, y: yP + m, size: 0.105 * u, min: 0.06 * u, maxW: W - 2 * m, maxLines: 2, ls: -0.015, lh: 1.0, breaks: true, color: 'black', on: 'lavender' });
+    R.footer(yF);
+  },
+
+  // Scene 02 / Product story: headline on white, photo band, operational view on lavender.
+  'scene-story'(R) {
+    const { W, H, u, m, frame } = R;
+    const c = frame.content;
+    const yF = Math.round(H * 0.875), yP0 = Math.round(H * 0.3), yP1 = Math.round(H * 0.6);
+    R.field('white', 0, 0, W, yP0);
+    const lab = Math.round(0.0167 * u);
+    if (c.label) R.text({ role: 'label', text: c.label, x: m, y: m, size: lab, color: 'black', on: 'white' });
+    R.text({ role: 'headline', text: c.headline, x: m, y: m + lab * CAP + 0.05 * u, size: 0.08 * u, min: 0.05 * u, maxW: W * 0.72, maxLines: 2, ls: -0.015, lh: 1.02, color: 'black', on: 'white' });
+    if (frame.photo) R.photo(frame.photo, { x: 0, y: yP0, w: W, h: yP1 - yP0 });
+    const rw = Math.max(4, Math.round(0.0146 * u));
+    R.rule(0, yP1, rw, yF - yP1);
+    R.field('lavender', rw, yP1, W - rw, yF - yP1);
+    if (c.status_label) R.text({ role: 'label', text: c.status_label, x: m, y: yP1 + m, size: lab, color: 'black', on: 'lavender' });
+    if (c.lead) R.text({ role: 'lead', text: c.lead, x: m, y: yP1 + m + lab * CAP + 0.04 * u, size: 0.042 * u, min: 0.03 * u, maxW: W - 2 * m, maxLines: 3, lh: 1.2, color: 'black', on: 'lavender' });
+    R.footer(yF);
+  },
+
+  // Scene 03 / Invitation: big statement, CTA, pilot status, all on lavender.
+  'scene-invite'(R) {
+    const { W, H, u, m, frame } = R;
+    const c = frame.content;
+    const yF = Math.round(H * 0.875);
+    R.field('lavender', 0, 0, W, yF);
+    const lab = Math.round(0.0167 * u);
+    if (c.label) R.text({ role: 'label', text: c.label, x: m, y: m, size: lab, color: 'black', on: 'lavender' });
+    const hl = R.text({ role: 'headline', text: c.headline, x: m, y: m + lab * CAP + 0.06 * u, size: 0.22 * u, min: 0.1 * u, maxW: W - 2 * m, maxLines: 2, ls: -0.03, lh: 0.95, color: 'black', on: 'lavender' });
+    const ctaSize = Math.round(0.04 * u), arrowLen = Math.round(0.06 * u);
+    const ctaTop = hl.bottom + 0.09 * u;
+    if (c.cta) { R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: 'lavender' }); R.arrow(W - m, ctaTop + ctaSize * CAP / 2, arrowLen); }
+    if (c.status) R.text({ role: 'status', text: c.status, x: m, y: yF - m - 0.03 * u * CAP - 0.03 * u * 1.25, size: 0.03 * u, min: 0.02 * u, maxW: W * 0.55, maxLines: 2, lh: 1.25, color: 'black', on: 'lavender' });
     R.footer(yF);
   },
 };

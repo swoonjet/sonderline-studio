@@ -1,0 +1,376 @@
+{
+  "spec": "d3-product-perspective",
+  "copy": {
+    "status": "pass",
+    "checks": [
+      {
+        "id": "alt",
+        "title": "Alt text present and factual",
+        "page": 6,
+        "status": "pass",
+        "detail": "274 characters."
+      }
+    ]
+  },
+  "frames": {
+    "slide-01": {
+      "report": {
+        "status": "pass",
+        "checks": [
+          {
+            "id": "copy",
+            "title": "On-image copy is approved",
+            "page": 13,
+            "status": "pass",
+            "detail": "7 text elements, all from the approved library.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "contrast",
+            "title": "Text contrast \u2265 4.5:1 (measured)",
+            "page": 6,
+            "status": "pass",
+            "detail": "Lowest 5.82:1 across 7 elements.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "pairing",
+            "title": "Approved text/background pairings",
+            "page": 6,
+            "status": "pass",
+            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "palette",
+            "title": "Fields use the five brand colours",
+            "page": 3,
+            "status": "pass",
+            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "vermilion",
+            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "page": 4,
+            "status": "pass",
+            "detail": "0.3% of pixels (target about 3%).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "type",
+            "title": "Inter Tight 400/700 only",
+            "page": 5,
+            "status": "pass",
+            "detail": "Weights used: 400.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "fit",
+            "title": "Text fits, nothing collides",
+            "page": 7,
+            "status": "pass",
+            "detail": "All copy fits its box at a legible size.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "size",
+            "title": "Type no smaller than micro-label size",
+            "page": 5,
+            "status": "pass",
+            "detail": "Smallest 25px (min 23px).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "logo",
+            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "page": 2,
+            "status": "pass",
+            "detail": "Supplied lockup, 69px visible height, clearspace clear.",
+            "boxes": [
+              {
+                "kind": "logo",
+                "key": "lockup_white",
+                "file": "brand-kit/assets/sonderline_lockup_white.svg",
+                "x": 1265.6875898078529,
+                "y": 935.04,
+                "w": 629.042410192147,
+                "h": 138.92000000000002,
+                "aspect": 4.528091060985798,
+                "expectedAspect": 4.528091060985798,
+                "visible": {
+                  "x": 1300.417589807853,
+                  "y": 969.77,
+                  "w": 559.582410192147,
+                  "h": 69.46000000000001
+                }
+              }
+            ],
+            "gate": null
+          },
+          {
+            "id": "footer",
+            "title": "One frame, clear footer",
+            "page": 7,
+            "status": "pass",
+            "detail": "Black footer with logo.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "photo",
+            "title": "Photography: supplied, sharp enough",
+            "page": 8,
+            "status": "pass",
+            "detail": "motion-study at 125%. Fictional, AI-generated images supplied with the kit: disclose and never use as customer evidence.",
+            "boxes": [],
+            "gate": null
+          }
+        ]
+      },
+      "notes": [
+        "Scrim auto-set to 40% so the headline clears 5:1 on this crop."
+      ]
+    },
+    "slide-02": {
+      "report": {
+        "status": "pass",
+        "checks": [
+          {
+            "id": "copy",
+            "title": "On-image copy is approved",
+            "page": 13,
+            "status": "pass",
+            "detail": "13 text elements, all from the approved library.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "contrast",
+            "title": "Text contrast \u2265 4.5:1 (measured)",
+            "page": 6,
+            "status": "pass",
+            "detail": "Lowest 14.22:1 across 13 elements.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "pairing",
+            "title": "Approved text/background pairings",
+            "page": 6,
+            "status": "pass",
+            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "palette",
+            "title": "Fields use the five brand colours",
+            "page": 3,
+            "status": "pass",
+            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "vermilion",
+            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "page": 4,
+            "status": "pass",
+            "detail": "0.2% of pixels (target about 3%).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "type",
+            "title": "Inter Tight 400/700 only",
+            "page": 5,
+            "status": "pass",
+            "detail": "Weights used: 400.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "fit",
+            "title": "Text fits, nothing collides",
+            "page": 7,
+            "status": "pass",
+            "detail": "All copy fits its box at a legible size.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "size",
+            "title": "Type no smaller than micro-label size",
+            "page": 5,
+            "status": "pass",
+            "detail": "Smallest 25px (min 23px).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "logo",
+            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "page": 2,
+            "status": "pass",
+            "detail": "Supplied lockup, 69px visible height, clearspace clear.",
+            "boxes": [
+              {
+                "kind": "logo",
+                "key": "lockup_white",
+                "file": "brand-kit/assets/sonderline_lockup_white.svg",
+                "x": 1265.6875898078529,
+                "y": 935.04,
+                "w": 629.042410192147,
+                "h": 138.92000000000002,
+                "aspect": 4.528091060985798,
+                "expectedAspect": 4.528091060985798,
+                "visible": {
+                  "x": 1300.417589807853,
+                  "y": 969.77,
+                  "w": 559.582410192147,
+                  "h": 69.46000000000001
+                }
+              }
+            ],
+            "gate": null
+          },
+          {
+            "id": "footer",
+            "title": "One frame, clear footer",
+            "page": 7,
+            "status": "pass",
+            "detail": "Black footer with logo.",
+            "boxes": [],
+            "gate": null
+          }
+        ]
+      },
+      "notes": []
+    },
+    "slide-03": {
+      "report": {
+        "status": "pass",
+        "checks": [
+          {
+            "id": "copy",
+            "title": "On-image copy is approved",
+            "page": 13,
+            "status": "pass",
+            "detail": "5 text elements, all from the approved library.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "contrast",
+            "title": "Text contrast \u2265 4.5:1 (measured)",
+            "page": 6,
+            "status": "pass",
+            "detail": "Lowest 14.22:1 across 5 elements.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "pairing",
+            "title": "Approved text/background pairings",
+            "page": 6,
+            "status": "pass",
+            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "palette",
+            "title": "Fields use the five brand colours",
+            "page": 3,
+            "status": "pass",
+            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "vermilion",
+            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "page": 4,
+            "status": "pass",
+            "detail": "0.3% of pixels (target about 3%).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "type",
+            "title": "Inter Tight 400/700 only",
+            "page": 5,
+            "status": "pass",
+            "detail": "Weights used: 400.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "fit",
+            "title": "Text fits, nothing collides",
+            "page": 7,
+            "status": "pass",
+            "detail": "All copy fits its box at a legible size.",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "size",
+            "title": "Type no smaller than micro-label size",
+            "page": 5,
+            "status": "pass",
+            "detail": "Smallest 25px (min 23px).",
+            "boxes": [],
+            "gate": null
+          },
+          {
+            "id": "logo",
+            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "page": 2,
+            "status": "pass",
+            "detail": "Supplied lockup, 69px visible height, clearspace clear.",
+            "boxes": [
+              {
+                "kind": "logo",
+                "key": "lockup_white",
+                "file": "brand-kit/assets/sonderline_lockup_white.svg",
+                "x": 1265.6875898078529,
+                "y": 935.04,
+                "w": 629.042410192147,
+                "h": 138.92000000000002,
+                "aspect": 4.528091060985798,
+                "expectedAspect": 4.528091060985798,
+                "visible": {
+                  "x": 1300.417589807853,
+                  "y": 969.77,
+                  "w": 559.582410192147,
+                  "h": 69.46000000000001
+                }
+              }
+            ],
+            "gate": null
+          },
+          {
+            "id": "footer",
+            "title": "One frame, clear footer",
+            "page": 7,
+            "status": "pass",
+            "detail": "Black footer with logo.",
+            "boxes": [],
+            "gate": null
+          }
+        ]
+      },
+      "notes": []
+    }
+  }
+}
