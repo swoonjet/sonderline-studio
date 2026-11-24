@@ -90,14 +90,14 @@ export function validateFrame(result, canvas, brand) {
       return !(pair in T.text_pairings);
     });
     if (bad.length) add('pairing', 'Approved text/background pairings', 6, 'fail', bad.map(t => `"${t.text}" ${nameOf[t.color.toUpperCase()]} on ${t.on}`).join(' · '), bad);
-    else add('pairing', 'Approved text/background pairings', 6, 'pass', 'Black on light and accent fields, white on black and over photography only.');
+    else add('pairing', 'Approved text/background pairings', 6, 'pass', 'Black text on light and accent fields, white text on black and on photography.');
   }
 
   // 4. Palette: every flat field is a brand colour
   {
     const off = G.filter(g => g.kind === 'field' && !nameOf[g.color.toUpperCase()]);
-    add('palette', 'Fields use the five brand colours', 3, off.length ? 'fail' : 'pass',
-      off.length ? off.map(g => g.color).join(', ') : 'Black, white, lavender, cool grey, vermilion only.', off);
+    add('palette', 'Colour fields use the brand palette', 3, off.length ? 'fail' : 'pass',
+      off.length ? off.map(g => g.color).join(', ') : 'Only black, white, lavender, cool grey and vermilion are used.', off);
   }
 
   // 5. Vermilion share, counted on the final pixels
@@ -109,7 +109,7 @@ export function validateFrame(result, canvas, brand) {
       if (Math.abs(img.data[i] - vr) + Math.abs(img.data[i + 1] - vg) + Math.abs(img.data[i + 2] - vb) < 36) n++;
     }
     const share = n / (img.data.length / 16);
-    add('vermilion', 'Vermilion is a signal (≤ 5% of the frame)', 4, share <= T.vermilion_max_share ? 'pass' : 'fail',
+    add('vermilion', 'Vermilion is at or below 5% of the frame', 4, share <= T.vermilion_max_share ? 'pass' : 'fail',
       `${(share * 100).toFixed(1)}% of pixels (target about 3%).`);
   }
 
@@ -131,17 +131,17 @@ export function validateFrame(result, canvas, brand) {
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
       if (intersects(boxes[i], boxes[j])) hits.push([boxes[i], boxes[j]]);
     }
-    if (over.length || hits.length) add('fit', 'Text fits, nothing collides', 7, 'fail',
+    if (over.length || hits.length) add('fit', 'Text fits without overlapping', 7, 'fail',
       [...over.map(t => `"${t.text}" does not fit`), ...hits.map(([a, b]) => `${a.text ?? a.kind} overlaps ${b.text ?? b.kind}`)].join(' · '),
       [...over, ...hits.flat()]);
-    else add('fit', 'Text fits, nothing collides', 7, 'pass', 'All copy fits its box at a legible size.');
+    else add('fit', 'Text fits without overlapping', 7, 'pass', 'All copy fits its area at a legible size.');
   }
 
   // 8. Minimum type size: never smaller than the guide's own micro-labels
   {
     const min = 0.0155 * u;
     const small = texts.filter(t => t.size < min);
-    add('size', 'Type no smaller than micro-label size', 5, small.length ? 'fail' : 'pass',
+    add('size', 'Type is no smaller than the guide\'s micro-labels', 5, small.length ? 'fail' : 'pass',
       small.length ? small.map(t => `"${t.text}" ${t.size}px < ${min.toFixed(0)}px`).join(' · ') : `Smallest ${Math.min(...texts.map(t => t.size))}px (min ${min.toFixed(0)}px).`, small);
   }
 
@@ -157,7 +157,7 @@ export function validateFrame(result, canvas, brand) {
       if (l.visible.h < 0.035 * u) issues.push(`logo too small (${l.visible.h.toFixed(0)}px tall)`);
     }
     if (!logos.length) issues.push('no logo');
-    add('logo', 'Logo: supplied art, h/2 clearspace, legible', 2, issues.length ? 'fail' : 'pass',
+    add('logo', 'Logo uses the supplied art with h/2 clearspace', 2, issues.length ? 'fail' : 'pass',
       issues.length ? issues.join(' · ') : `Supplied lockup, ${logos[0].visible.h.toFixed(0)}px visible height, clearspace clear.`, logos);
   }
 
@@ -166,7 +166,7 @@ export function validateFrame(result, canvas, brand) {
     const footer = G.find(g => g.kind === 'field' && g.name === 'black' && Math.abs(g.y + g.h - H) < 1);
     const logo = G.find(g => g.kind === 'logo');
     const ok = footer && logo && logo.visible.y >= footer.y;
-    add('footer', 'One frame, clear footer', 7, ok ? 'pass' : 'fail', ok ? 'Black footer with logo.' : 'Missing footer or logo outside it.');
+    add('footer', 'Black footer with the logo', 7, ok ? 'pass' : 'fail', ok ? 'Black footer with logo.' : 'Missing footer or logo outside it.');
   }
 
   // 11. Platform safe zones (stories)
@@ -174,7 +174,7 @@ export function validateFrame(result, canvas, brand) {
     const lo = f.safeTop, hi = H - f.safeBottom;
     const out = [...texts, ...G.filter(g => g.kind === 'logo').map(l => ({ ...l.visible, text: 'logo' }))]
       .filter(b => b.y < lo || b.y + b.h > hi);
-    add('safezone', 'Clear of platform UI (story safe zone)', null, out.length ? 'fail' : 'pass',
+    add('safezone', 'Text and logo are inside the story safe zone', null, out.length ? 'fail' : 'pass',
       out.length ? out.map(b => `"${b.text}"`).join(' · ') : `All text and logo between ${lo}px and ${hi}px.`, out);
   }
 
@@ -183,7 +183,7 @@ export function validateFrame(result, canvas, brand) {
     const ph = G.filter(g => g.kind === 'photo');
     if (ph.length) {
       const big = ph.filter(p => p.upscale > 1.6);
-      add('photo', 'Photography: supplied, sharp enough', 8, big.length ? 'review' : 'pass',
+      add('photo', 'Photography is supplied and not over-enlarged', 8, big.length ? 'review' : 'pass',
         `${ph.map(p => `${p.id} at ${(p.upscale * 100).toFixed(0)}%`).join(', ')}. Fictional, AI-generated images supplied with the kit: disclose and never use as customer evidence.` +
         (big.length ? ' Enlarged past 160%: check for softness.' : ''), big, big.length ? 'Designer' : undefined);
     }
@@ -192,8 +192,8 @@ export function validateFrame(result, canvas, brand) {
   // 13. Assumed assets must be confirmed
   {
     const flows = G.filter(g => g.kind === 'graphic' && g.status === 'assumed');
-    if (flows.length) add('assumed', 'Assumed brand assets confirmed', null, 'review',
-      'Uses the stand-in flow graphic (the kit listed flow graphics but none were supplied).', flows, 'Brand lead');
+    if (flows.length) add('assumed', 'Assumed brand assets are confirmed', null, 'review',
+      'Uses the Contour flow graphic, which is a proposal because the kit\'s flow graphics were not supplied.', flows, 'Brand lead');
   }
 
   return summarise(checks);

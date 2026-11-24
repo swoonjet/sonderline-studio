@@ -1,0 +1,86 @@
+{
+  "concourse-walk": {
+    "file": "assets/video/concourse-walk.webm",
+    "aspect": "16:9",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "motion-study",
+    "model": "google/veo-3.1-fast",
+    "note": "Figure in a dark coat walking through the concourse; camera follows. Face never visible.",
+    "safe_window": [
+      0,
+      8
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  },
+  "concourse-stream": {
+    "file": "assets/video/concourse-stream.webm",
+    "aspect": "16:9",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "motion-study",
+    "model": "google/veo-3.1-fast",
+    "note": "Commuters crossing the concourse. Use 0 to 3.9 s only: later frames show faces.",
+    "safe_window": [
+      0,
+      3.95
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  },
+  "metal-glide": {
+    "file": "assets/video/metal-glide.webm",
+    "aspect": "16:9",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "material-study",
+    "model": "google/veo-3.1-fast",
+    "note": "Camera glides along ribbed metal; the shadow rises into a stepped curve.",
+    "safe_window": [
+      0,
+      8
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  },
+  "metal-sweep": {
+    "file": "assets/video/metal-sweep.webm",
+    "aspect": "16:9",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "material-study",
+    "model": "google/veo-3.1-fast",
+    "note": "A band of light sweeps across the ribbed metal.",
+    "safe_window": [
+      0,
+      8
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  },
+  "concourse-walk-vertical": {
+    "file": "assets/video/concourse-walk-vertical.webm",
+    "aspect": "9:16",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "motion-study",
+    "model": "google/veo-3.1-fast",
+    "note": "Vertical: the figure walks away from camera. Face never visible.",
+    "safe_window": [
+      0,
+      8
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  },
+  "metal-glide-vertical": {
+    "file": "assets/video/metal-glide-vertical.webm",
+    "aspect": "9:16",
+    "seconds": 8,
+    "fps": 24,
+    "from_photo": "material-study",
+    "model": "google/veo-3.1-fast",
+    "note": "Vertical: slow glide along the ribbed metal.",
+    "safe_window": [
+      0,
+      8
+    ],
+    "provenance": "AI-generated from a supplied (AI-generated) still; fictional."
+  }
+}

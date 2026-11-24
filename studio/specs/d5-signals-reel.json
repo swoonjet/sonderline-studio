@@ -1,0 +1,112 @@
+{
+  "id": "d5-signals-reel",
+  "title": "Site signals: 17-second vertical reel",
+  "kind": "video",
+  "request": {
+    "requester": "Brand and social team",
+    "channel": "Instagram Reels and LinkedIn vertical video, 9:16",
+    "brief": "A vertical explainer of what Pulse brings together, with one signal per bar, ending on the invitation."
+  },
+  "format": "story",
+  "fps": 24,
+  "music": "chronolith-b",
+  "content": {
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "scenes": [
+    {
+      "layout": "contour-title",
+      "beats": 8,
+      "field": "black",
+      "textIn": 4,
+      "content": {
+        "label": "SONDERLINE PULSE / PRODUCT PERSPECTIVE",
+        "headline": "Site signals.",
+        "lead": "One consolidated view across your locations."
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 4,
+      "field": "white",
+      "index": "01 / 04",
+      "continuous": false,
+      "clip": {
+        "name": "metal-glide-vertical",
+        "in": 0
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Site activity"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 4,
+      "field": "lavender",
+      "index": "02 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide-vertical",
+        "in": 0
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Service requests"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 4,
+      "field": "coolgrey",
+      "index": "03 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide-vertical",
+        "in": 0
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Escalations"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 4,
+      "field": "white",
+      "index": "04 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide-vertical",
+        "in": 0
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Team updates"
+      }
+    },
+    {
+      "layout": "photo-hero",
+      "beats": 12,
+      "accent": "lavender",
+      "clip": {
+        "name": "concourse-walk-vertical",
+        "in": 0.5
+      },
+      "content": {
+        "headline": "Meet Pulse.",
+        "label": "SONDERLINE PULSE",
+        "lead": "A clearer view across every location.",
+        "cta": "Request a Pulse demo.",
+        "status_label": "EARLY ACCESS",
+        "status": "Pilots planned for Q1 2027."
+      }
+    }
+  ],
+  "caption": "Site signals. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Meet Pulse. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Seventeen-second vertical video. Fine lines flow across a black frame: Site signals, one consolidated view across your locations. Over moving light on brushed metal, four words appear one per bar: Site activity, Service requests, Escalations, Team updates. A figure in a dark coat walks through a concourse: Meet Pulse. Request a Pulse demo. Early access, pilots planned for Q1 2027."
+}

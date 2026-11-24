@@ -1,0 +1,50 @@
+{
+  "concourse-walk": {
+    "id": "gen-vid-1795539362-RKXGO51sKolejU8itNlG",
+    "status": "completed",
+    "aspect": "16:9",
+    "photo": "motion-study",
+    "prompt": "Continue this photograph as live footage. The person in the long black coat keeps walking steadily through the glass-and-steel concourse, close to the camera. The camera pans slowly sideways with them; long-exposure motion blur streaks the figure and the architecture; reflections slide across the polished floor. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  },
+  "concourse-stream": {
+    "id": "gen-vid-1795539364-5hENDHj7iXSD2fRSLUxj",
+    "status": "completed",
+    "aspect": "16:9",
+    "photo": "motion-study",
+    "prompt": "Continue this photograph as live footage from a locked-off camera. The figure in the black coat passes out of frame; soft blurred silhouettes of other commuters stream through the concourse as streaks of light and shadow; daylight shifts gently on the glass. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  },
+  "metal-glide": {
+    "id": "gen-vid-1795539367-eVSYuiyUTkm7yj4nKXX0",
+    "status": "completed",
+    "aspect": "16:9",
+    "photo": "material-study",
+    "prompt": "Extreme close-up of ribbed brushed aluminium. The camera glides slowly along the ribs; daylight moves across the surface so highlights travel along the ridges and the curved black shadow slides gently. Macro, shallow focus. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  },
+  "metal-sweep": {
+    "id": "gen-vid-1795539369-usg6hajOnDGbuyOGrDJw",
+    "status": "completed",
+    "aspect": "16:9",
+    "photo": "material-study",
+    "prompt": "Extreme close-up of ribbed brushed aluminium. A band of soft sunlight sweeps across the metal, as if light were passing through a moving window; the curved shadow breathes and recedes. Very slow push-in. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  },
+  "concourse-walk-vertical": {
+    "id": "gen-vid-1795539371-jZdtkA4G3PzMWAuFyoSD",
+    "status": "completed",
+    "aspect": "9:16",
+    "photo": "motion-study",
+    "prompt": "Continue this photograph as live footage. The person in the long black coat walks steadily through the concourse, close to the camera; slow camera follow, long-exposure motion blur, reflections sliding on the floor. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  },
+  "metal-glide-vertical": {
+    "id": "gen-vid-1795539374-T6D5C36CS9v6WeDAj05x",
+    "status": "completed",
+    "aspect": "9:16",
+    "photo": "material-study",
+    "prompt": "Extreme close-up of ribbed brushed aluminium. Slow vertical camera glide along the ribs; daylight travels across the ridges and the dark curved shadow slides. Macro, shallow focus. Monochrome silver, black and cool grey with only a faint lavender reflection; fine photographic grain; calm, observational art-book photography. Keep the exact look and composition of the first frame. No faces, no text, no logos, no new objects, no colour shift, no cuts.",
+    "cost": 0.8
+  }
+}

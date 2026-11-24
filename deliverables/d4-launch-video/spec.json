@@ -1,0 +1,129 @@
+{
+  "id": "d4-launch-video",
+  "title": "Launch video: 17-second feed post",
+  "kind": "video",
+  "request": {
+    "requester": "Product marketing",
+    "channel": "LinkedIn and Instagram feed video, 4:5",
+    "brief": "A short video for the early-access pilots. Open on the main idea, show what Pulse brings together, and end on the demo request. It has to work with the sound off."
+  },
+  "format": "feed",
+  "fps": 24,
+  "music": "chronolith-a",
+  "content": {
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "scenes": [
+    {
+      "layout": "full-bleed",
+      "beats": 12,
+      "textIn": 4,
+      "clip": {
+        "name": "concourse-walk",
+        "in": 0
+      },
+      "content": {
+        "label": "SONDERLINE PULSE",
+        "headline": "Every site. One view."
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 2,
+      "field": "white",
+      "index": "01 / 04",
+      "continuous": false,
+      "clip": {
+        "name": "metal-glide",
+        "in": 0.4
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Site activity"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 2,
+      "field": "lavender",
+      "index": "02 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide",
+        "in": 0.4
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Service requests"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 2,
+      "field": "coolgrey",
+      "index": "03 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide",
+        "in": 0.4
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Escalations"
+      }
+    },
+    {
+      "layout": "signal",
+      "beats": 2,
+      "field": "white",
+      "index": "04 / 04",
+      "continuous": true,
+      "clip": {
+        "name": "metal-glide",
+        "in": 0.4
+      },
+      "overlay": false,
+      "content": {
+        "label": "THE OPERATIONAL VIEW",
+        "signal": "Team updates"
+      }
+    },
+    {
+      "layout": "photo-hero",
+      "beats": 8,
+      "accent": "lavender",
+      "clip": {
+        "name": "concourse-stream",
+        "in": 0,
+        "out": 3.95
+      },
+      "reviewNote": "Distant figures in the concourse: designer to confirm no face is recognisable.",
+      "content": {
+        "headline": "Progress, in view.",
+        "label": "SONDERLINE PULSE",
+        "lead": "A clearer view across every location.",
+        "cta": "Request a Pulse demo.",
+        "status_label": "EARLY ACCESS",
+        "status": "Pilots planned for Q1 2027."
+      }
+    },
+    {
+      "layout": "type-led",
+      "beats": 8,
+      "field": "lavender",
+      "flow": true,
+      "flowStyle": "contour",
+      "content": {
+        "label": "SONDERLINE PULSE",
+        "headline": "Meet Pulse.",
+        "lead": "Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates.",
+        "cta": "Request a Pulse demo."
+      }
+    }
+  ],
+  "caption": "Every site. One view. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Meet Pulse. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Seventeen-second video. A figure in a dark coat walks through a glass concourse under fine moving lines: Every site. One view. Light moves across brushed metal as four words appear in turn: Site activity, Service requests, Escalations, Team updates. Commuters cross the concourse: Progress, in view. Lavender end card: Meet Pulse. Request a Pulse demo."
+}

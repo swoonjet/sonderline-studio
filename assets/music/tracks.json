@@ -1,23 +1,30 @@
 {
-  "pulse": {
-    "file": "assets/music/pulse.m4a",
-    "bpm": 120,
-    "seconds": 64.0,
-    "mood": "Minimal and forward: soft four-on-the-floor, warm pad, plucked arpeggio",
-    "source": "Original, synthesised for this prototype by tools/make_music.py (no samples)."
+  "chronolith-a": {
+    "file": "assets/music/chronolith-a.m4a",
+    "bpm": 123.61,
+    "beat": 0.485387,
+    "bars": 9,
+    "seconds": 18.674,
+    "drop_bar": 1,
+    "track_bars": [
+      6,
+      15
+    ],
+    "mood": "Quiet bar, then the drop (track bars 6 to 14)",
+    "source": "Supplied by Jon Toews: an excerpt of the track used in his Chronolith type showcase. Each excerpt starts on a bar line."
   },
-  "contour": {
-    "file": "assets/music/contour.m4a",
-    "bpm": 96,
-    "seconds": 60.0,
-    "mood": "Ambient and patient: wide pads, sparse bells, no drums",
-    "source": "Original, synthesised for this prototype by tools/make_music.py (no samples)."
-  },
-  "signal": {
-    "file": "assets/music/signal.m4a",
-    "bpm": 120,
-    "seconds": 64.0,
-    "mood": "Bright and rhythmic: pentatonic plucks, claps on 2 and 4",
-    "source": "Original, synthesised for this prototype by tools/make_music.py (no samples)."
+  "chronolith-b": {
+    "file": "assets/music/chronolith-b.m4a",
+    "bpm": 123.61,
+    "beat": 0.485387,
+    "bars": 9,
+    "seconds": 18.674,
+    "drop_bar": 1,
+    "track_bars": [
+      41,
+      50
+    ],
+    "mood": "Quiet bar, then the fullest section (track bars 41 to 49)",
+    "source": "Supplied by Jon Toews: an excerpt of the track used in his Chronolith type showcase. Each excerpt starts on a bar line."
   }
 }

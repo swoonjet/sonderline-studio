@@ -48,7 +48,7 @@ export function render(canvas, brand, frame, formatId) {
 export const REQUIRED = {
   'photo-hero': ['headline'], 'type-led': ['headline'], 'signal': ['signal'], 'signal-grid': ['headline'],
   'scene-context': ['headline'], 'scene-story': ['headline'], 'scene-invite': ['headline'],
-  'contour-title': ['headline'], 'contour-end': ['headline'],
+  'contour-title': ['headline'], 'contour-end': ['headline'], 'full-bleed': ['headline'],
 };
 
 const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
@@ -59,7 +59,7 @@ function crowded(G) {
   return false;
 }
 
-class Renderer {
+export class Renderer {
   constructor(ctx, brand, f, frame, relax = 0) {
     Object.assign(this, { ctx, brand, f, frame, relax });
     this.W = f.w; this.H = f.h; this.u = f.u;
@@ -86,8 +86,9 @@ class Renderer {
     this.geometry.push({ kind: 'field', color: hex, name: colorKey, x, y, w, h });
   }
 
-  photo(p, r) {
-    const img = this.brand.photos[p.id];
+  photo(p, r, opts = {}) {
+    // footage (a video element or any drawable set by the motion engine) or a supplied photo
+    const img = p.video ? this.brand.footage?.[p.video] : this.brand.photos[p.id];
     if (!img) {
       this.field('coolgrey', r.x, r.y, r.w, r.h);
       this.geometry.push({ kind: 'missing', slot: 'photo', detail: p.id, ...r });
@@ -95,8 +96,9 @@ class Renderer {
     }
     // sane ranges: zoom 1-3x, focus inside the photo
     const z = Math.min(3, Math.max(1, Number(p.zoom) || 1));
-    const s = Math.max(r.w / img.width, r.h / img.height) * z;
-    const dw = img.width * s, dh = img.height * s;
+    const iw = img.videoWidth || img.width, ih = img.videoHeight || img.height;
+    const s = Math.max(r.w / iw, r.h / ih) * z;
+    const dw = iw * s, dh = ih * s;
     const clamp01 = v => Math.min(1, Math.max(0, Number.isFinite(+v) ? +v : 0.5));
     const fx = clamp01(p.focus?.[0]), fy = clamp01(p.focus?.[1]);
     const dx = Math.min(r.x, Math.max(r.x + r.w - dw, r.x + r.w / 2 - fx * dw));
@@ -105,8 +107,9 @@ class Renderer {
     ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
     ctx.drawImage(img, dx, dy, dw, dh);
     ctx.restore();
-    const g = { kind: 'photo', id: p.id, ...r, upscale: s, scrim: 0 };
+    const g = { kind: 'photo', id: p.video || p.id, footage: !!p.video, ...r, upscale: s, scrim: 0 };
     this.geometry.push(g);
+    if (this.frame.overlay && !opts.noOverlay) this.overlay(r, this.frame.overlay);
     return g;
   }
 
@@ -153,6 +156,67 @@ class Renderer {
 
   rule(x, y, w, h) { this.field('vermilion', x, y, w, h); }
 
+  // Overlays on footage (video only): a smooth Contour field that flows and breathes with the
+  // beat, plus an optional tint. Drawn as part of the background, so contrast checks include it.
+  overlay(r, o, avoid) {
+    const ctx = this.ctx;
+    if (o.tint) { ctx.save(); ctx.globalAlpha = o.tint.alpha ?? 0.25; ctx.globalCompositeOperation = o.tint.mode || 'multiply'; ctx.fillStyle = this.c[o.tint.color] ?? o.tint.color; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.restore(); }
+    if (o.contour) {
+      const c = o.contour;
+      const band = { x: r.x, y: r.y + r.h * (c.top ?? 0.55), w: r.w, h: r.h * (c.height ?? 0.38) };
+      // never run lines behind type: keep the band below the text block it would otherwise cross
+      if (avoid) {
+        const lift = 0.06 * this.u + band.h * 0.15;
+        const minY = avoid.y + avoid.h + lift;
+        if (band.y < minY) { band.h -= minY - band.y; band.y = minY; }
+        band.h = Math.min(band.h, r.y + r.h - band.y - 0.02 * this.u);
+      }
+      if (band.h > 0.06 * this.u) this.contourField(band, { ...c, time: o.time ?? 0, beat: o.beat ?? 0 });
+    }
+  }
+
+  // Fine bands that step together through the S symbol's curve (Contour), drawn smoothly for motion:
+  // the step glides with time, its height breathes on each beat, and a vermilion line runs along one band.
+  contourField(r, o) {
+    const ctx = this.ctx, u = this.u;
+    const n = o.lines ?? Math.max(10, Math.round(r.h / (0.024 * u)));
+    const pulse = Math.exp(-6 * ((o.beat ?? 0) % 1));               // 1 on each beat, decays within the beat
+    // the whole field, including the raised side of the step, stays inside r
+    const rise = 2.2 + 0.35 * (o.punch ?? 1);
+    const pitch = r.h / (n + rise), t = Math.max(1.2, pitch * (o.weight ?? 0.42));
+    const dy = -pitch * (2.2 + 0.35 * pulse * (o.punch ?? 1));
+    const travel = ((o.time ?? 0) * (o.speed ?? 0.06)) % 1;
+    const xs = r.x + r.w * (0.25 + 0.5 * (0.5 - 0.5 * Math.cos(travel * Math.PI * 2)));
+    const w = r.w * (o.run ?? 0.24);
+    const reveal = Math.min(1, Math.max(0, o.reveal ?? 1));
+    const ease = x => { const k = Math.min(1, Math.max(0, x)); return k * k * (3 - 2 * k); };
+    const colour = this.c[o.color] ?? o.color ?? '#FFFFFF';
+    ctx.save();
+    ctx.beginPath(); ctx.rect(r.x, r.y, r.w * reveal, r.h); ctx.clip();
+    ctx.globalAlpha = o.alpha ?? 0.35;
+    const sig = Math.floor(n * 0.62);
+    for (let i = 0; i < n; i++) {
+      const base = r.y + (rise + i + 0.5) * pitch;
+      const shift = i * r.w * 0.006;
+      ctx.beginPath();
+      for (let x = r.x; x <= r.x + r.w + 2; x += 2) {
+        const y = base + dy * ease((x - (xs + shift - w / 2)) / w);
+        x === r.x ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.lineWidth = t; ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+      if (o.signal !== false && i === sig) {
+        ctx.save(); ctx.globalAlpha = Math.min(1, (o.alpha ?? 0.35) * 2.4); ctx.strokeStyle = this.c.vermilion;
+        // the signal runs along its line once per bar
+        const run = ((o.beat ?? 0) / 4) % 1;
+        ctx.setLineDash([r.w * 0.28, r.w * 2]); ctx.lineDashOffset = -r.w * 2.28 * run + r.w * 0.28;
+        ctx.stroke(); ctx.restore();
+        ctx.strokeStyle = colour; ctx.stroke();
+      } else { ctx.strokeStyle = colour; ctx.stroke(); }
+    }
+    ctx.restore();
+    this.geometry.push({ kind: 'graphic', name: 'flow', style: 'contour', status: 'assumed', ...r });
+  }
+
   // Flow graphics (ASSUMED; see tokens.flow). Built from the S symbol's stroke: a horizontal band
   // that steps through a smooth S-curve, with the symbol's slanted "/" terminals. Never the symbol
   // itself. Deterministic per seed so re-renders match.
@@ -174,8 +238,11 @@ class Renderer {
       for (let i = n; i >= 0; i--) { const x = x0 + (x1 - sl - x0) * i / n; ctx.lineTo(x, yAt(x) + t); }
       ctx.closePath(); ctx.fill();
     };
-    // motion: bands draw on from the left and the step travels (video only)
+    // motion: in video, Contour is drawn as a smooth field that flows and breathes with the beat
     const anim = this.frame.flowAnim;
+    if (anim && style === 'contour') {
+      return this.contourField(r, { color: cw.bars, alpha: 1, weight: 0.45, time: anim.time ?? 0, beat: anim.beat ?? 0, reveal: anim.progress, punch: 1.2 });
+    }
     const drawW = anim ? r.w * Math.min(1, Math.max(0, anim.progress)) : r.w;
     const shift = anim ? (anim.phase - 0.5) * 0.22 * r.w : 0;
     ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, drawW, r.h); ctx.clip();
@@ -310,8 +377,11 @@ class Renderer {
       fit.lines.forEach((l, i) => this.ctx.fillText(l, t.x, capTop + cap + i * fit.size * lh));
       this.ctx.textAlign = 'left';
     });
+    const baselines = fit.lines.map((l, i) => capTop + cap + i * fit.size * lh);
+    const lineBoxes = baselines.map(base => ({ x: x0, y: base - fit.size * 0.95, w: width, h: fit.size * 1.22 }));
     this.geometry.push({
-      kind: 'text', role: t.role, text: String(t.text ?? fit.lines.join(' ')), system: !!t.system, lines: fit.lines,
+      kind: 'text', role: t.role, text: String(t.text ?? fit.lines.join(' ')), system: !!t.system, lines: fit.lines, lineBoxes, baselines,
+      draw: { x: t.x, align: t.align || 'left', ls: t.ls || 0, family: this.brand.tokens.type.family },
       size: fit.size, weight: t.weight || 400, color, on: t.on, overflow: fit.overflow,
       maxLines: t.maxLines ?? 1, ...box, baseline: capTop + cap,
     });
@@ -319,8 +389,9 @@ class Renderer {
   }
 
   arrow(x2, yMid, len, color = 'black') {
-    const ctx = this.ctx, lw = Math.max(1.5, 0.0022 * this.u), hd = 0.011 * this.u;
+    const lw = Math.max(1.5, 0.0022 * this.u), hd = 0.011 * this.u;
     this.fg.push(() => {
+      const ctx = this.ctx;
       ctx.strokeStyle = this.c[color] ?? color; ctx.lineWidth = lw; ctx.lineCap = 'butt';
       ctx.beginPath();
       ctx.moveTo(x2 - len, yMid); ctx.lineTo(x2, yMid);
@@ -358,6 +429,20 @@ class Renderer {
   }
 
   finish() {
+    const layers = this.frame.layers;
+    if (layers) {
+      // motion: keep the background and the type as separate layers, no pixel readback
+      const bgC = layers.bg, fgC = layers.fg;
+      bgC.width = fgC.width = this.W; bgC.height = fgC.height = this.H;
+      bgC.getContext('2d').drawImage(this.ctx.canvas, 0, 0);
+      const main = this.ctx;
+      this.ctx = fgC.getContext('2d');
+      this.ctx.clearRect(0, 0, this.W, this.H);
+      this.ctx.textBaseline = 'alphabetic';
+      for (const op of this.fg) op();
+      this.ctx = main;
+      return { geometry: this.geometry, W: this.W, H: this.H, format: this.f, notes: this.notes, frame: this.frame, layers };
+    }
     this.bg = this.ctx.getImageData(0, 0, this.W, this.H);
     for (const op of this.fg) op();
     return { geometry: this.geometry, bg: this.bg, W: this.W, H: this.H, format: this.f, notes: this.notes, frame: this.frame };
@@ -455,11 +540,12 @@ const LAYOUTS = {
     const top = Math.max(Math.round(1.1 * m), R.safeTop ? R.safeTop + 0.12 * h.size : 0);
     const box = { x: m, y: top - 0.08 * h.size, w: h.width, h: h.size * CAP + (h.lines.length - 1) * h.size * 0.98 + (DESC + 0.08) * h.size };
     if (hasPhoto) {
-      const g = R.photo(frame.photo, photoRect);
+      const g = R.photo(frame.photo, photoRect, { noOverlay: true });
       R.geometry.pop();
-      const redraw = () => { R.ctx.fillStyle = '#000'; R.ctx.fillRect(0, 0, W, yI); R.photo(frame.photo, photoRect); R.geometry.pop(); };
+      const redraw = () => { R.ctx.fillStyle = '#000'; R.ctx.fillRect(0, 0, W, yI); R.photo(frame.photo, photoRect, { noOverlay: true }); R.geometry.pop(); };
       R.geometry.push(g);
       R.scrim(g, frame.scrim ?? 'auto', box, redraw);
+      if (frame.overlay) R.overlay(photoRect, frame.overlay, box);
     } else {
       R.field('black', 0, 0, W, yI);
       const fy = box.y + box.h + 0.08 * u, fh = yI - fy - 0.08 * u;
@@ -639,6 +725,31 @@ const LAYOUTS = {
     if (c.status_label) R.text({ role: 'label', text: c.status_label, x: m, y: yP1 + m, size: lab, color: 'black', on: 'lavender' });
     const lTop = yP1 + m + lab * CAP + 0.04 * u;
     if (c.lead) R.text({ role: 'lead', text: c.lead, x: m, y: lTop, size: 0.042 * u, min: 0.022 * u, maxW: colW - 2 * m, maxLines: 4 + R.relax, maxH: yF - m - lTop, lh: 1.2, color: 'black', on: 'lavender' });
+    R.footer(yF);
+  },
+
+  // Full-bleed image or footage above the footer, white type over a solved scrim. Video openers.
+  'full-bleed'(R) {
+    const { W, u, m, frame } = R;
+    const yF = R.yF, c = frame.content;
+    const rect = { x: 0, y: 0, w: W, h: yF };
+    const lab = Math.round(0.0167 * u);
+    const hTop = c.label ? R.top + lab * CAP + 0.04 * u : R.top;
+    const h = R.fit(c.headline, { size: 0.13 * u, min: (0.05 - 0.005 * R.relax) * u, maxW: W * (R.landscape ? 0.6 : 0.86) - m,
+      maxLines: 3 + R.relax, ls: -0.015, lh: 0.98, breaks: true, maxH: yF * 0.45 });
+    const box = { x: m, y: R.top - 0.1 * u, w: Math.max(h.width, W * 0.4), h: hTop - R.top + 0.1 * u + h.size * CAP + (h.lines.length - 1) * h.size * 0.98 + (DESC + 0.08) * h.size };
+    if (frame.photo) {
+      const g = R.photo(frame.photo, rect, { noOverlay: true });
+      R.geometry.pop();
+      const redraw = () => { R.ctx.fillStyle = '#000'; R.ctx.fillRect(0, 0, W, yF); R.photo(frame.photo, rect, { noOverlay: true }); R.geometry.pop(); };
+      R.geometry.push(g);
+      R.scrim(g, frame.scrim ?? 'auto', box, redraw);
+      if (frame.overlay) R.overlay(rect, frame.overlay, box);
+    } else R.field('black', 0, 0, W, yF);
+    const on = frame.photo ? 'photo' : 'black';
+    if (c.label) R.text({ role: 'label', text: c.label, x: m, y: R.top, size: lab, color: 'white', on });
+    R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: h.size, lines: h.lines, overflow: h.overflow, ls: -0.015, lh: 0.98, color: 'white', on, maxLines: 3 + R.relax });
+    if (c.lead) R.text({ role: 'lead', text: c.lead, x: m, y: yF - m - 0.046 * u * 2.2, size: 0.04 * u, min: 0.024 * u, maxW: W * 0.62, maxLines: 2, lh: 1.1, color: 'white', on });
     R.footer(yF);
   },
 

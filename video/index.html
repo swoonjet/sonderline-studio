@@ -10,12 +10,12 @@
 </head>
 <body>
 <header class="bar">
-  <div class="brand"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="" class="sym"><strong>Pulse Video Studio</strong><span class="muted">Sonderline Social System · motion prototype</span></div>
-  <nav><a href="../">Overview</a><a href="../docs/">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio (stills)</a></nav>
+  <div class="brand"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="" class="sym"><strong>Pulse Video Studio</strong><span class="muted">Sonderline video post prototype</span></div>
+  <nav><a href="../">Overview</a><a href="../docs/">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio</a></nav>
 </header>
 
 <ol class="steps" aria-label="Workflow">
-  <li><b>1</b> Template</li><li><b>2</b> Scenes</li><li><b>3</b> Preview</li><li><b>4</b> Check</li><li><b>5</b> Approve &amp; export</li>
+  <li><b>1</b> Template</li><li><b>2</b> Scenes</li><li><b>3</b> Preview</li><li><b>4</b> Check</li><li><b>5</b> Approve and export</li>
 </ol>
 
 <main class="grid">
@@ -23,10 +23,10 @@
     <h2><b>1</b> Template</h2>
     <label>Start from
       <select id="preset">
-        <option value="../studio/specs/d5-launch-teaser.json">D5 · Launch teaser · 4:5 · 12s</option>
-        <option value="../studio/specs/d6-signals-reel.json">D6 · Site signals reel · 9:16 · 16s</option>
-        <option value="../studio/specs/d4-pulse-motion.json">D4 · Storyboard (guide p12) · 4:5</option>
-        <option value="blank">Blank: title card + end card</option>
+        <option value="../studio/specs/d4-launch-video.json">D4 · Launch video · 4:5</option>
+        <option value="../studio/specs/d4-launch-video-landscape.json">D4 · Launch video · 16:9</option>
+        <option value="../studio/specs/d5-signals-reel.json">D5 · Site signals reel · 9:16</option>
+        <option value="blank">Blank: footage opener and end card</option>
       </select>
     </label>
     <div class="row2">
@@ -42,7 +42,7 @@
       <button id="addScene">Add scene</button>
     </div>
     <label>Caption<textarea id="caption" rows="4"></textarea></label>
-    <label>Alt text / description<textarea id="alt" rows="3"></textarea></label>
+    <label>Alt text<textarea id="alt" rows="3"></textarea></label>
     <details>
       <summary>Video spec JSON</summary>
       <textarea id="json" rows="14" spellcheck="false"></textarea>
@@ -55,31 +55,31 @@
     <div class="stage"><div class="stageInner"><canvas id="screen"></canvas></div></div>
     <div class="transport">
       <button id="play" class="primary" aria-label="Play">Play</button>
-      <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Scrub">
+      <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Position">
       <span id="clock" class="clock">0.0s</span>
       <label class="check"><input type="checkbox" id="sound" checked> Sound</label>
     </div>
     <div id="lanes" class="lanes" aria-hidden="true"></div>
-    <p class="fine">Type wipes on and then holds. The photography pans, Contour lines draw on, and scenes cut on the beat through a Contour wipe. The footer never moves.</p>
+    <p class="fine">Scene lengths are counted in beats of the music, so every scene change lands on a beat. The footage was generated from the two supplied photos. Contour lines move over the footage, each line of type rises into place and then holds, and the footer stays fixed.</p>
   </section>
 
   <section class="col right">
     <h2><b>4</b> Check <span id="overall" class="chip"></span></h2>
-    <p class="fine">Each scene is checked like a still at the start, middle and end of its move.</p>
+    <p class="fine">Each scene is checked like a still image at the start, middle and end of its footage.</p>
     <div id="checks"></div>
-    <h3>Caption &amp; alt text</h3>
+    <h3>Caption and alt text</h3>
     <ul id="copyChecks" class="checks"></ul>
 
-    <h2><b>5</b> Approve &amp; export</h2>
+    <h2><b>5</b> Approve and export</h2>
     <div id="gates"></div>
     <button id="record" class="primary" disabled>Record video with music</button>
     <button id="saveSpec">Download spec</button>
     <p id="exportStatus" class="fine"></p>
-    <p class="fine">Recording runs in real time in this browser (MP4 where supported, otherwise WebM). For frame-accurate MP4 masters: <code>tools/produce_video.py &lt;spec&gt;</code>.</p>
+    <p class="fine">Recording runs in real time in this browser and saves an MP4 where the browser supports it, otherwise WebM. For frame-accurate MP4 masters, run <code>tools/produce_video.py</code> with the spec.</p>
   </section>
 </main>
 
-<footer class="foot fine">Prototype by Jon Toews for SketchDeck. Sonderline is fictional. Photography is the kit's own AI-generated imagery. Music is original, synthesised for this prototype. Contour is a proposed flow graphic derived from the S symbol. Inter Tight, SIL OFL 1.1.</footer>
+<footer class="foot fine">Prototype by Jon Toews for SketchDeck. Sonderline is a fictional brand. The footage was generated from the kit's AI-generated photos with Google Veo 3.1 Fast. The music is an excerpt of a track supplied by Jon Toews. Contour is a proposed flow graphic based on the S symbol. Inter Tight, SIL OFL 1.1.</footer>
 <script type="module" src="video-app.js"></script>
 </body>
 </html>

@@ -4,26 +4,38 @@
 <script type="module">
   // Headless target for tools/produce_video.py: the same motion engine the Video Studio previews.
   import { loadBrand } from './js/brand.js';
-  import { MotionRenderer } from './js/motion.js';
+  import { MotionRenderer, timeline } from './js/motion.js';
   const q = new URLSearchParams(location.search);
   try {
     const brand = await loadBrand('..');
     const tracks = await fetch('../assets/music/tracks.json').then(r => r.json());
     const spec = await fetch(q.get('spec')).then(r => r.json());
-    const fps = spec.fps || 30;
-    const mr = new MotionRenderer(brand, spec, tracks).prepare();
+    const tl = timeline(spec, tracks);
+    // one <video> per scene group (continuous scenes share their group's element)
+    const els = {};
+    for (const sc of tl.scenes) {
+      if (!sc.clip || sc.continuous) continue;
+      const v = document.createElement('video');
+      v.muted = true; v.preload = 'auto'; v.playsInline = true;
+      v.src = `../assets/video/${sc.clip.name}.webm`;
+      await new Promise((res, rej) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', () => rej(new Error(`Could not load ${sc.clip.name}`)), { once: true }); });
+      els[sc.index] = v;
+    }
+    const mr = await new MotionRenderer(brand, spec, tracks, { video: i => els[i] || null }).prepare();
     const out = document.createElement('canvas');
-    const checks = mr.check();
+    const checks = await mr.check();
     window.__video = {
-      spec, fps, total: Math.round(mr.tl.total * fps), seconds: mr.tl.total, bpm: mr.tl.bpm,
-      music: spec.music && tracks[spec.music] ? tracks[spec.music].file : null,
-      frame(i) { mr.frameAt(i / fps, out); return out.toDataURL('image/jpeg', 0.94); },
-      held() {
-        return mr.tl.scenes.map((sc, k) => {
+      spec, fps: mr.fps, total: Math.round(mr.tl.total * mr.fps), seconds: mr.tl.total, bpm: mr.tl.bpm,
+      music: mr.tl.music ? mr.tl.music.file : null,
+      async frame(i) { await mr.frameAt((i + 0.5) / mr.fps, out); return out.toDataURL('image/jpeg', 0.93); },
+      async held() {
+        const outs = [];
+        for (const [k, sc] of mr.tl.scenes.entries()) {
           const c = document.createElement('canvas');
-          mr.heldFrame(sc, c);
-          return { name: `scene-${String(k + 1).padStart(2, '0')}`, png: c.toDataURL('image/png'), report: checks.scenes[k] };
-        });
+          await mr.heldFrame(sc, c);
+          outs.push({ name: `scene-${String(k + 1).padStart(2, '0')}`, png: c.toDataURL('image/png'), report: checks.scenes[k] });
+        }
+        return outs;
       },
       copy: checks.copy,
     };
