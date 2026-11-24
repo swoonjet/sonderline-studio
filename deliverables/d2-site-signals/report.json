@@ -103,7 +103,7 @@
             "title": "Vermilion is a signal (\u2264 5% of the frame)",
             "page": 4,
             "status": "pass",
-            "detail": "0.4% of pixels (target about 3%).",
+            "detail": "1.0% of pixels (target about 3%).",
             "boxes": [],
             "gate": null
           },
@@ -180,12 +180,13 @@
               {
                 "kind": "graphic",
                 "name": "flow",
+                "style": "contour",
                 "colourway": "lavender",
                 "status": "assumed",
                 "x": 43,
-                "y": 619.758,
+                "y": 608.958,
                 "w": 994,
-                "h": 211.20899999999983
+                "h": 243.60900000000004
               }
             ],
             "gate": "Brand lead"
@@ -739,7 +740,7 @@
             "title": "Vermilion is a signal (\u2264 5% of the frame)",
             "page": 4,
             "status": "pass",
-            "detail": "0.6% of pixels (target about 3%).",
+            "detail": "0.9% of pixels (target about 3%).",
             "boxes": [],
             "gate": null
           },
@@ -816,12 +817,13 @@
               {
                 "kind": "graphic",
                 "name": "flow",
+                "style": "contour",
                 "colourway": "black",
                 "status": "assumed",
                 "x": 43,
-                "y": 353.41099999999994,
+                "y": 528.545,
                 "w": 994,
-                "h": 352.189
+                "h": 177.05500000000004
               }
             ],
             "gate": "Brand lead"

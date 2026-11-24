@@ -25,16 +25,32 @@ export function render(canvas, brand, frame, formatId) {
   // a designer can override the crop per format (portrait and landscape rarely want the same crop)
   const ov = frame.photo && frame.photoOverrides?.[formatId];
   if (ov) frame = { ...frame, photo: { ...frame.photo, ...ov } };
-  const R = new Renderer(ctx, brand, f, frame);
   const layout = LAYOUTS[frame.layout];
   if (!layout) throw new Error(`Unknown layout "${frame.layout}"`);
-  layout(R);
+  // Elastic layout: if copy doesn't fit, re-lay the frame giving text more room
+  // (smaller photo band, more lines, slightly smaller minimum size). Up to 3 steps.
+  let R;
+  for (let relax = 0; relax <= 3; relax++) {
+    ctx.clearRect(0, 0, f.w, f.h);
+    R = new Renderer(ctx, brand, f, frame, relax);
+    layout(R);
+    if (!crowded(R.geometry)) break;
+  }
+  if (R.relax) R.notes.push(`Copy needed more room: layout relaxed ${R.relax} step${R.relax > 1 ? 's' : ''}.`);
   return R.finish();
 }
 
+const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+function crowded(G) {
+  const boxes = G.filter(g => g.kind === 'text' || g.kind === 'arrow' || g.kind === 'logo');
+  if (G.some(g => g.kind === 'text' && (g.overflow || g.lines.length > g.maxLines))) return true;
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) if (hit(boxes[i], boxes[j])) return true;
+  return false;
+}
+
 class Renderer {
-  constructor(ctx, brand, f, frame) {
-    Object.assign(this, { ctx, brand, f, frame });
+  constructor(ctx, brand, f, frame, relax = 0) {
+    Object.assign(this, { ctx, brand, f, frame, relax });
     this.W = f.w; this.H = f.h; this.u = f.u;
     this.m = Math.round(0.04 * f.u);
     this.c = Object.fromEntries(Object.entries(brand.tokens.colour).map(([k, v]) => [k, v.hex]));
@@ -340,7 +356,8 @@ function infoRow(R, yI, hI) {
   const floor = yI + hI - 0.55 * pad;                  // lowest ink allowed in the row
   const ctaTop = yI + hI - pad - ctaSize * CAP;
   const lw = split - 2 * m;
-  const leadOpts = { size: 0.046 * u, min: 0.026 * u, maxLines: 3, ls: -0.005, lh: 1.1 };
+  const k = R.relax;
+  const leadOpts = { size: 0.046 * u, min: (0.026 - 0.002 * k) * u, maxLines: 3 + k, ls: -0.005, lh: 1.1 };
 
   if (c.lead) {
     let mode = 'stacked';
@@ -350,7 +367,7 @@ function infoRow(R, yI, hI) {
       const cf = R.fit(c.lead, { ...leadOpts, maxW: leadW, maxH: floor - leadTop });
       if (!cf.overflow) { mode = 'row'; lf = cf; }
     }
-    const lead = R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, ls: -0.005, lh: 1.1, color: 'black', on: 'white', maxLines: 3 });
+    const lead = R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, ls: -0.005, lh: 1.1, color: 'black', on: 'white', maxLines: 3 + k });
     if (c.cta && mode === 'stacked') {
       R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: 'white' });
       R.arrow(split - m, ctaTop + ctaSize * CAP * 0.5, arrowLen);
@@ -395,14 +412,15 @@ const LAYOUTS = {
   // Guide p09: one message over photography, info row, clear footer.
   'photo-hero'(R) {
     const { W, H, u, m, frame } = R;
-    const yI = Math.round(H * R.f.photo), yF = R.yF;
+    const k = R.relax, hLines = R.f.headlineLines + (k >= 2 ? 1 : 0);
+    const yI = Math.round(H * (R.f.photo - 0.07 * k)), yF = R.yF;
     const photoRect = { x: 0, y: 0, w: W, h: yI };
     const hasPhoto = !!frame.photo;
     const est = Math.max(Math.round(1.1 * m), R.safeTop ? R.safeTop + 0.02 * u : 0);
     // measure the headline first so the scrim can be solved against its real box
     const h = R.fit(frame.content.headline, {
-      size: (frame.headlineScale ?? R.f.headlineScale ?? 0.125) * u, min: 0.05 * u, maxW: R.f.headlineW * W,
-      maxLines: R.f.headlineLines, ls: -0.015, lh: 0.98, breaks: true, maxH: yI - est - 0.9 * m,
+      size: (frame.headlineScale ?? R.f.headlineScale ?? 0.125) * u, min: (0.05 - 0.005 * k) * u, maxW: R.f.headlineW * W,
+      maxLines: hLines, ls: -0.015, lh: 0.98, breaks: true, maxH: yI - est - 0.9 * m,
     });
     const top = Math.max(Math.round(1.1 * m), R.safeTop ? R.safeTop + 0.12 * h.size : 0);
     const box = { x: m, y: top - 0.08 * h.size, w: h.width, h: h.size * CAP + (h.lines.length - 1) * h.size * 0.98 + (DESC + 0.08) * h.size };
@@ -419,7 +437,7 @@ const LAYOUTS = {
     }
     R.text({
       role: 'headline', text: frame.content.headline, x: m, y: top, size: h.size, lines: h.lines, overflow: h.overflow,
-      ls: -0.015, lh: 0.98, color: 'white', on: hasPhoto ? 'photo' : 'black', maxLines: R.f.headlineLines,
+      ls: -0.015, lh: 0.98, color: 'white', on: hasPhoto ? 'photo' : 'black', maxLines: hLines,
     });
     infoRow(R, yI, yF - yI);
     R.footer(yF);
@@ -440,9 +458,9 @@ const LAYOUTS = {
     const ctaTop = yF - m - ctaSize * CAP;
     let leadTop = c.cta ? ctaTop - 0.02 * u : yF - m;
     if (c.lead) {
-      const lf = R.fit(c.lead, { size: 0.046 * u, min: 0.026 * u, maxW: W * (R.landscape ? 0.55 : 0.75), maxLines: 4, ls: -0.005, lh: 1.1, maxH: 0.3 * yF });
+      const lf = R.fit(c.lead, { size: 0.046 * u, min: (0.026 - 0.002 * R.relax) * u, maxW: W * Math.min(0.92, (R.landscape ? 0.55 : 0.75) + 0.1 * R.relax), maxLines: 4 + R.relax, ls: -0.005, lh: 1.1, maxH: (0.3 + 0.07 * R.relax) * yF });
       leadTop = (c.cta ? ctaTop - 0.07 * u : yF - m) - blockH(lf, 1.1) + DESC * lf.size;
-      R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, lh: 1.1, ls: -0.005, color: 'black', on: fieldKey, maxLines: 4 });
+      R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, lh: 1.1, ls: -0.005, color: 'black', on: fieldKey, maxLines: 4 + R.relax });
     }
     if (c.cta) {
       R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: fieldKey });
@@ -450,8 +468,8 @@ const LAYOUTS = {
     }
     const hTop = top + lab * CAP + 0.05 * u;
     const hl = R.text({
-      role: 'headline', text: c.headline, x: m, y: hTop, size: 0.2 * u, min: 0.06 * u,
-      maxW: W * (R.landscape ? 0.75 : 1) - 2 * m, maxLines: 3, maxH: leadTop - 0.06 * u - hTop,
+      role: 'headline', text: c.headline, x: m, y: hTop, size: 0.2 * u, min: (0.06 - 0.008 * R.relax) * u,
+      maxW: W * (R.landscape ? 0.75 + 0.08 * R.relax : 1) - 2 * m, maxLines: 3 + (R.relax >= 2 ? 1 : 0), maxH: leadTop - 0.06 * u - hTop,
       ls: -0.025, lh: 0.95, breaks: true, color: 'black', on: fieldKey,
     });
     const fy = hl.bottom + 0.06 * u, fh = leadTop - 0.08 * u - fy;
@@ -468,12 +486,12 @@ const LAYOUTS = {
     const fieldKey = frame.field || 'white';
     let textW = W, topY;
     if (side) {
-      const pw = Math.round(W * 0.4);
+      const pw = Math.round(W * (0.4 - 0.06 * R.relax));
       if (frame.photo) R.photo(frame.photo, { x: W - pw, y: 0, w: pw, h: yF });
       R.field(fieldKey, 0, 0, W - pw, yF);
       textW = W - pw; topY = R.top;
     } else {
-      const yP = Math.round(H * (frame.photoBand ?? 0.4));
+      const yP = Math.round(H * ((frame.photoBand ?? 0.4) - 0.06 * R.relax));
       if (frame.photo) R.photo(frame.photo, { x: 0, y: 0, w: W, h: yP });
       R.field(fieldKey, 0, yP, W, yF - yP);
       topY = Math.max(yP + m, R.safeTop);
@@ -484,10 +502,10 @@ const LAYOUTS = {
     const items = R.brand.copy.product.signals;
     const size = Math.round((side ? 0.026 : 0.029) * u), step = Math.round(size * 1.5), mk = Math.round(0.016 * u);
     const y0 = yF - m - size * CAP - (items.length - 1) * step;
-    const sTop = topY + lab * CAP + 0.06 * u;
+    const sTop = topY + lab * CAP + 0.045 * u;
     R.text({
-      role: 'headline', text: c.signal, x: m, y: sTop, size: 0.14 * u, min: 0.05 * u,
-      maxW: side ? textW - 2 * m : textW * 0.62, maxLines: 2, maxH: y0 - 0.06 * u - sTop, ls: -0.02, lh: 0.98, color: 'black', on: fieldKey,
+      role: 'headline', text: c.signal, x: m, y: sTop, size: 0.14 * u, min: (0.05 - 0.005 * R.relax) * u,
+      maxW: side ? textW - 2 * m : textW * 0.62, maxLines: 2, maxH: y0 - 0.025 * u - sTop, ls: -0.02, lh: 0.98, color: 'black', on: fieldKey,
     });
     items.forEach((it, i) => {
       const cur = it === c.signal;
@@ -507,31 +525,31 @@ const LAYOUTS = {
     R.field('white', 0, 0, W, yF);
     let gx, gy, gw, capX;
     if (R.landscape) {
-      const lw = Math.round(W * 0.34);
+      const lw = Math.round(W * (0.34 + 0.04 * R.relax));
       R.field('lavender', 0, 0, lw, yF);
       R.rule(0, 0, Math.round(lw * 0.25), rw);
       const ctaTop = yF - m - ctaSize * CAP;
       let leadTop = ctaTop;
       if (c.lead) {
-        const lf = R.fit(c.lead, { size: 0.034 * u, min: 0.02 * u, maxW: lw - 2 * m, maxLines: 4, ls: -0.005, maxH: 0.3 * yF });
+        const lf = R.fit(c.lead, { size: 0.034 * u, min: 0.02 * u, maxW: lw - 2 * m, maxLines: 4 + R.relax, ls: -0.005, maxH: (0.3 + 0.06 * R.relax) * yF });
         leadTop = ctaTop - 0.06 * u - blockH(lf, 1.12) + DESC * lf.size;
-        R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, color: 'black', on: 'lavender', maxLines: 4 });
+        R.text({ role: 'lead', text: c.lead, x: m, y: leadTop, size: lf.size, lines: lf.lines, overflow: lf.overflow, color: 'black', on: 'lavender', maxLines: 4 + R.relax });
       }
       if (c.cta) { R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: 'lavender' }); R.arrow(lw - m, ctaTop + ctaSize * CAP / 2, arrowLen); }
       const hTop = Math.round(1.6 * m);
-      R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.11 * u, min: 0.04 * u, maxW: lw - 2 * m, maxLines: 3, maxH: leadTop - 0.05 * u - hTop, ls: -0.025, lh: 0.95, color: 'black', on: 'lavender' });
+      R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.11 * u, min: (0.04 - 0.004 * R.relax) * u, maxW: lw - 2 * m, maxLines: 3 + R.relax, maxH: leadTop - 0.05 * u - hTop, ls: -0.025, lh: 0.95, color: 'black', on: 'lavender' });
       if (c.label) R.text({ role: 'label', text: c.label, x: lw + m, y: Math.round(1.1 * m), size: lab, color: 'black', on: 'white' });
       gx = lw; gy = Math.round(2.4 * m) + lab; gw = W - lw; capX = lw + m;
     } else {
-      const pH = Math.round(R.top + (yF - R.top) * 0.36);
+      const pH = Math.round(R.top + (yF - R.top) * (0.36 + 0.06 * R.relax));
       R.field('lavender', 0, 0, W, pH);
       R.rule(0, 0, Math.round(W * 0.17), rw);
       if (c.label) R.text({ role: 'label', text: c.label, x: m, y: R.top + rw, size: lab, color: 'black', on: 'lavender' });
       const ctaTop = pH - m - ctaSize * CAP;
       if (c.cta) { R.text({ role: 'cta', text: c.cta, x: m, y: ctaTop, size: ctaSize, color: 'black', on: 'lavender' }); R.arrow(W - m, ctaTop + ctaSize * CAP / 2, arrowLen); }
       const hTop = R.top + rw + lab * CAP + 0.045 * u, hMax = ctaTop - 0.05 * u - hTop;
-      R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.11 * u, min: 0.04 * u, maxW: W * 0.5 - m, maxLines: 3, maxH: hMax, ls: -0.025, lh: 0.95, color: 'black', on: 'lavender' });
-      if (c.lead) R.text({ role: 'lead', text: c.lead, x: W * 0.54, y: hTop + 0.01 * u, size: 0.034 * u, min: 0.02 * u, maxW: W * 0.46 - m, maxLines: 4, maxH: hMax, color: 'black', on: 'lavender' });
+      R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.11 * u, min: (0.04 - 0.004 * R.relax) * u, maxW: W * 0.5 - m, maxLines: 3 + R.relax, maxH: hMax, ls: -0.025, lh: 0.95, color: 'black', on: 'lavender' });
+      if (c.lead) R.text({ role: 'lead', text: c.lead, x: W * 0.54, y: hTop + 0.01 * u, size: 0.034 * u, min: 0.02 * u, maxW: W * 0.46 - m, maxLines: 4 + R.relax, maxH: hMax, color: 'black', on: 'lavender' });
       gx = 0; gy = pH; gw = W; capX = m;
     }
     const capH = capabilities(R, capX, yF - m, W - capX - m, 'white', true);
@@ -553,15 +571,15 @@ const LAYOUTS = {
     const { W, H, u, m, frame } = R;
     const yF = R.yF;
     if (R.landscape) {
-      const pw = Math.round(W * 0.5);
+      const pw = Math.round(W * (0.5 - 0.06 * R.relax));
       if (frame.photo) R.photo(frame.photo, { x: W - pw, y: 0, w: pw, h: yF });
       R.field('lavender', 0, 0, W - pw, yF);
-      R.text({ role: 'headline', text: frame.content.headline, x: m, y: R.top, size: 0.12 * u, min: 0.05 * u, maxW: W - pw - 2 * m, maxLines: 3, maxH: yF - m - R.top, ls: -0.015, lh: 1.0, breaks: true, color: 'black', on: 'lavender' });
+      R.text({ role: 'headline', text: frame.content.headline, x: m, y: R.top, size: 0.12 * u, min: (0.05 - 0.005 * R.relax) * u, maxW: W - pw - 2 * m, maxLines: 3 + R.relax, maxH: yF - m - R.top, ls: -0.015, lh: 1.0, breaks: true, color: 'black', on: 'lavender' });
     } else {
-      const yP = Math.round(H * 0.6);
+      const yP = Math.round(H * (0.6 - 0.07 * R.relax));
       if (frame.photo) R.photo(frame.photo, { x: 0, y: 0, w: W, h: yP });
       R.field('lavender', 0, yP, W, yF - yP);
-      R.text({ role: 'headline', text: frame.content.headline, x: m, y: yP + m, size: 0.105 * u, min: 0.05 * u, maxW: W - 2 * m, maxLines: 3, maxH: yF - 2 * m - yP, ls: -0.015, lh: 1.0, breaks: true, color: 'black', on: 'lavender' });
+      R.text({ role: 'headline', text: frame.content.headline, x: m, y: yP + m, size: 0.105 * u, min: (0.05 - 0.005 * R.relax) * u, maxW: W - 2 * m, maxLines: 3 + R.relax, maxH: yF - 2 * m - yP, ls: -0.015, lh: 1.0, breaks: true, color: 'black', on: 'lavender' });
     }
     R.footer(yF);
   },
@@ -573,24 +591,24 @@ const LAYOUTS = {
     const lab = Math.round(0.0167 * u), rw = Math.max(4, Math.round(0.0146 * u));
     let colW = W, yP0, yP1;
     if (R.landscape) {
-      const pw = Math.round(W * 0.42);
+      const pw = Math.round(W * (0.42 - 0.05 * R.relax));
       colW = W - pw;
       yP0 = yP1 = Math.round(yF * 0.5);
       if (frame.photo) R.photo(frame.photo, { x: colW, y: 0, w: pw, h: yF });
     } else {
-      yP0 = Math.round(R.top + 0.3 * H - Math.round(1.1 * m));
-      yP1 = Math.round(yP0 + 0.5 * (yF - yP0));
+      yP0 = Math.round(R.top + (0.3 + 0.04 * R.relax) * H - Math.round(1.1 * m));
+      yP1 = Math.round(yP0 + (0.5 - 0.1 * R.relax) * (yF - yP0));
       if (frame.photo) R.photo(frame.photo, { x: 0, y: yP0, w: W, h: yP1 - yP0 });
     }
     R.field('white', 0, 0, colW, yP0);
     if (c.label) R.text({ role: 'label', text: c.label, x: m, y: R.top, size: lab, color: 'black', on: 'white' });
     const hTop = R.top + lab * CAP + 0.05 * u;
-    R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.08 * u, min: 0.04 * u, maxW: colW * 0.78, maxLines: 3, maxH: yP0 - 0.04 * u - hTop, ls: -0.015, lh: 1.02, color: 'black', on: 'white' });
+    R.text({ role: 'headline', text: c.headline, x: m, y: hTop, size: 0.08 * u, min: (0.04 - 0.004 * R.relax) * u, maxW: colW * (0.78 + 0.05 * R.relax), maxLines: 3 + R.relax, maxH: yP0 - 0.04 * u - hTop, ls: -0.015, lh: 1.02, color: 'black', on: 'white' });
     R.rule(0, yP1, rw, yF - yP1);
     R.field('lavender', rw, yP1, colW - rw, yF - yP1);
     if (c.status_label) R.text({ role: 'label', text: c.status_label, x: m, y: yP1 + m, size: lab, color: 'black', on: 'lavender' });
     const lTop = yP1 + m + lab * CAP + 0.04 * u;
-    if (c.lead) R.text({ role: 'lead', text: c.lead, x: m, y: lTop, size: 0.042 * u, min: 0.022 * u, maxW: colW - 2 * m, maxLines: 4, maxH: yF - m - lTop, lh: 1.2, color: 'black', on: 'lavender' });
+    if (c.lead) R.text({ role: 'lead', text: c.lead, x: m, y: lTop, size: 0.042 * u, min: 0.022 * u, maxW: colW - 2 * m, maxLines: 4 + R.relax, maxH: yF - m - lTop, lh: 1.2, color: 'black', on: 'lavender' });
     R.footer(yF);
   },
 
@@ -603,15 +621,15 @@ const LAYOUTS = {
     if (c.label) R.text({ role: 'label', text: c.label, x: m, y: R.top, size: lab, color: 'black', on: 'lavender' });
     let statusTop = yF - m;
     if (c.status) {
-      const sf = R.fit(c.status, { size: 0.03 * u, min: 0.018 * u, maxW: W * (R.landscape ? 0.45 : 0.6), maxLines: 2, lh: 1.25 });
+      const sf = R.fit(c.status, { size: 0.03 * u, min: 0.018 * u, maxW: W * (R.landscape ? 0.45 : 0.6) + 0.1 * W * R.relax, maxLines: 2 + R.relax, lh: 1.25 });
       statusTop = yF - m - blockH(sf, 1.25) + DESC * sf.size;
-      R.text({ role: 'status', text: c.status, x: m, y: statusTop, size: sf.size, lines: sf.lines, overflow: sf.overflow, lh: 1.25, color: 'black', on: 'lavender', maxLines: 2 });
+      R.text({ role: 'status', text: c.status, x: m, y: statusTop, size: sf.size, lines: sf.lines, overflow: sf.overflow, lh: 1.25, color: 'black', on: 'lavender', maxLines: 2 + R.relax });
     }
     const ctaSize = Math.round((R.landscape ? 0.032 : 0.04) * u), arrowLen = Math.round(0.06 * u);
     const hTop = R.top + lab * CAP + 0.06 * u;
     const ctaBlock = c.cta ? 0.07 * u + ctaSize * (CAP + DESC) : 0;
     const hl = R.text({
-      role: 'headline', text: c.headline, x: m, y: hTop, size: 0.22 * u, min: 0.05 * u, maxW: W - 2 * m, maxLines: 3,
+      role: 'headline', text: c.headline, x: m, y: hTop, size: 0.22 * u, min: (0.05 - 0.005 * R.relax) * u, maxW: W - 2 * m, maxLines: 3 + R.relax,
       maxH: statusTop - 0.08 * u - ctaBlock - hTop, ls: -0.03, lh: 0.95, breaks: true, color: 'black', on: 'lavender',
     });
     if (c.cta) {
