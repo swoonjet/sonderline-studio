@@ -1,6 +1,6 @@
 {
   "spec": "d4-launch-video",
-  "seconds": 17.473932,
+  "seconds": 21.357028,
   "bpm": 123.61270491381104,
   "copy": {
     "status": "pass",
@@ -45,7 +45,7 @@
         "title": "Alt text present and factual",
         "page": 6,
         "status": "pass",
-        "detail": "352 characters."
+        "detail": "400 characters."
       }
     ]
   },
@@ -960,9 +960,9 @@
               "style": "contour",
               "status": "assumed",
               "x": 43,
-              "y": 608.958,
+              "y": 655.24371,
               "w": 994,
-              "h": 133.60900000000004
+              "h": 151.03758000000002
             }
           ],
           "gate": "Brand lead"

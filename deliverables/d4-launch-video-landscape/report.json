@@ -1,6 +1,6 @@
 {
   "spec": "d4-launch-video-landscape",
-  "seconds": 17.473932,
+  "seconds": 21.357028,
   "bpm": 123.61270491381104,
   "copy": {
     "status": "pass",
@@ -10,7 +10,7 @@
         "title": "Alt text present and factual",
         "page": 6,
         "status": "pass",
-        "detail": "352 characters."
+        "detail": "400 characters."
       }
     ]
   },
@@ -782,7 +782,7 @@
     "scene-07": {
       "index": 6,
       "layout": "type-led",
-      "status": "pass",
+      "status": "review",
       "checks": [
         {
           "id": "copy",
@@ -891,6 +891,26 @@
           "detail": "Black footer with logo.",
           "boxes": [],
           "gate": null
+        },
+        {
+          "id": "assumed",
+          "title": "Assumed brand assets are confirmed",
+          "page": null,
+          "status": "review",
+          "detail": "Uses the Contour flow graphic, which is a proposal because the kit's flow graphics were not supplied.",
+          "boxes": [
+            {
+              "kind": "graphic",
+              "name": "flow",
+              "style": "contour",
+              "status": "assumed",
+              "x": 960,
+              "y": 568.067,
+              "w": 900,
+              "h": 196.12599999999998
+            }
+          ],
+          "gate": "Brand lead"
         }
       ]
     }

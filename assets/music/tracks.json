@@ -3,14 +3,14 @@
     "file": "assets/music/chronolith-a.m4a",
     "bpm": 123.61,
     "beat": 0.485387,
-    "bars": 9,
-    "seconds": 18.674,
+    "bars": 11,
+    "seconds": 22.557,
     "drop_bar": 1,
     "track_bars": [
       6,
-      15
+      17
     ],
-    "mood": "Quiet bar, then the drop (track bars 6 to 14)",
+    "mood": "Quiet bar, then the drop (track bars 6 to 16)",
     "source": "Supplied by Jon Toews: an excerpt of the track used in his Chronolith type showcase. Each excerpt starts on a bar line."
   },
   "chronolith-b": {

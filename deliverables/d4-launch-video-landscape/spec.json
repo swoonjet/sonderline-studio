@@ -1,6 +1,6 @@
 {
   "id": "d4-launch-video-landscape",
-  "title": "Launch video: 17-second landscape version (16:9)",
+  "title": "Launch video: 21-second landscape version (16:9)",
   "kind": "video",
   "request": {
     "requester": "Product marketing",
@@ -29,7 +29,7 @@
     },
     {
       "layout": "signal",
-      "beats": 2,
+      "beats": 4,
       "field": "white",
       "index": "01 / 04",
       "continuous": false,
@@ -45,7 +45,7 @@
     },
     {
       "layout": "signal",
-      "beats": 2,
+      "beats": 4,
       "field": "lavender",
       "index": "02 / 04",
       "continuous": true,
@@ -61,7 +61,7 @@
     },
     {
       "layout": "signal",
-      "beats": 2,
+      "beats": 4,
       "field": "coolgrey",
       "index": "03 / 04",
       "continuous": true,
@@ -77,7 +77,7 @@
     },
     {
       "layout": "signal",
-      "beats": 2,
+      "beats": 4,
       "field": "white",
       "index": "04 / 04",
       "continuous": true,
@@ -119,11 +119,11 @@
       "content": {
         "label": "SONDERLINE PULSE",
         "headline": "Meet Pulse.",
-        "lead": "Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates.",
+        "lead": "For organizations managing multiple locations.",
         "cta": "Request a Pulse demo."
       }
     }
   ],
   "caption": "Every site. One view. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Meet Pulse. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
-  "alt": "Seventeen-second video. A figure in a dark coat walks through a glass concourse under fine moving lines: Every site. One view. Light moves across brushed metal as four words appear in turn: Site activity, Service requests, Escalations, Team updates. Commuters cross the concourse: Progress, in view. Lavender end card: Meet Pulse. Request a Pulse demo."
+  "alt": "Twenty-one-second video. A figure in a dark coat walks through a glass concourse under fine moving lines: Every site. One view. Light moves across brushed metal as four words appear in turn: Site activity, Service requests, Escalations, Team updates. Commuters cross the concourse: Progress, in view. Lavender end card: Meet Pulse. For organizations managing multiple locations. Request a Pulse demo."
 }

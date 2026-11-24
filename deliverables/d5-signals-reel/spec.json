@@ -16,7 +16,7 @@
   "scenes": [
     {
       "layout": "contour-title",
-      "beats": 8,
+      "beats": 12,
       "field": "black",
       "textIn": 4,
       "content": {
@@ -91,7 +91,7 @@
     },
     {
       "layout": "photo-hero",
-      "beats": 12,
+      "beats": 8,
       "accent": "lavender",
       "clip": {
         "name": "concourse-walk-vertical",

@@ -174,17 +174,21 @@ export class MotionRenderer {
     const foot = items.filter(g => g.y >= yF);
     const prevHeld = sc.continuous && prev ? this.held[prev.index] : null;
     const nextHeld = next && next.continuous ? this.held[next.index] : null;
-    const textIn = sc.textIn ?? (sc.index === 0 ? 0.5 : 0.25);
-    const outStart = sc.beats - 1.1, outEnd = sc.beats - 0.55;
+    // Timing on the beat grid: lines start on half beats, each rise takes 1.5 beats, and type
+    // leaves over a full beat that ends half a beat before the downbeat.
+    const textIn = sc.textIn ?? 0.5;
+    const short = sc.beats <= 4;
+    const RISE = short ? 1 : 1.5, STAGGER = short ? 0.25 : 0.5, KMAX = 3;   // later items start with the fourth
+    const outStart = sc.beats - 1.5, outEnd = sc.beats - 0.5;
     let k = 0;
     for (const g of body) {
       const stays = prevHeld?.some(h => h.kind === g.kind && same(h, g));
       const leaves = next && !(nextHeld?.some(h => h.kind === g.kind && same(h, g)));
       const fadeOut = leaves && next && !next.continuous ? 1 - easeIO((b - outStart) / (outEnd - outStart))
-        : leaves ? 1 - easeIO((b - (sc.beats - 0.3)) / 0.3) : 1;
+        : leaves ? 1 - easeIO((b - (sc.beats - 1)) / 0.5) : 1;
       if (g.kind === 'text') {
         g.lines.forEach((line, i) => {
-          const p = stays ? 1 : easeOut((b - textIn - k * 0.22) / 0.9);
+          const p = stays ? 1 : easeIO((b - textIn - Math.min(k, KMAX) * STAGGER) / RISE);
           if (!stays) k++;
           const alpha = p * fadeOut;
           if (alpha <= 0.002) return;
@@ -198,7 +202,7 @@ export class MotionRenderer {
         });
       } else {
         // arrows and logos: a short fade from their own region of the type layer
-        const p = stays ? 1 : easeOut((b - textIn - k * 0.22) / 0.9);
+        const p = stays ? 1 : easeIO((b - textIn - Math.min(k, KMAX) * STAGGER) / RISE);
         const alpha = p * fadeOut;
         if (alpha <= 0.002) continue;
         ctx.save(); ctx.beginPath(); ctx.rect(g.x - 6, g.y - 6, g.w + 12, g.h + 12); ctx.clip();

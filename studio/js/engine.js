@@ -179,39 +179,56 @@ export class Renderer {
   // the step glides with time, its height breathes on each beat, and a vermilion line runs along one band.
   contourField(r, o) {
     const ctx = this.ctx, u = this.u;
+    const calm = !!o.calm;                                             // graphic cards: bands hold still
     const n = o.lines ?? Math.max(10, Math.round(r.h / (0.024 * u)));
-    const pulse = Math.exp(-6 * ((o.beat ?? 0) % 1));               // 1 on each beat, decays within the beat
+    const beatPos = o.beat ?? 0;
+    const pulse = Math.exp(-6 * (beatPos % 1));                      // 1 on each beat, decays within the beat
+    const punch = calm ? 0 : (o.punch ?? 1);
     // the whole field, including the raised side of the step, stays inside r
-    const rise = 2.2 + 0.35 * (o.punch ?? 1);
-    const pitch = r.h / (n + rise), t = Math.max(1.2, pitch * (o.weight ?? 0.42));
-    const dy = -pitch * (2.2 + 0.35 * pulse * (o.punch ?? 1));
-    const travel = ((o.time ?? 0) * (o.speed ?? 0.06)) % 1;
-    const xs = r.x + r.w * (0.25 + 0.5 * (0.5 - 0.5 * Math.cos(travel * Math.PI * 2)));
-    const w = r.w * (o.run ?? 0.24);
+    const rise = 2.2 + 0.35 * punch;
+    const pitch = r.h / (n + rise), t = Math.max(calm ? 2 : 1.2, pitch * (o.weight ?? 0.42));
+    const dy = -pitch * (2.2 + 0.35 * pulse * punch);
+    let xs;
+    if (calm) xs = r.x + r.w * ((o.stepAt ?? 0.62) + 0.015 * Math.sin((o.time ?? 0) * 0.35));
+    else {
+      const travel = ((o.time ?? 0) * (o.speed ?? 0.06)) % 1;
+      xs = r.x + r.w * (0.25 + 0.5 * (0.5 - 0.5 * Math.cos(travel * Math.PI * 2)));
+    }
+    const w = r.w * (o.run ?? (calm ? 0.2 : 0.24));
     const reveal = Math.min(1, Math.max(0, o.reveal ?? 1));
-    const ease = x => { const k = Math.min(1, Math.max(0, x)); return k * k * (3 - 2 * k); };
+    const ease = calm
+      ? x => { const k = Math.min(1, Math.max(0, x)); return k * k * k * (k * (k * 6 - 15) + 10); }   // smootherstep
+      : x => { const k = Math.min(1, Math.max(0, x)); return k * k * (3 - 2 * k); };
     const colour = this.c[o.color] ?? o.color ?? '#FFFFFF';
+    const step = calm ? 1 : 2;
     ctx.save();
-    ctx.beginPath(); ctx.rect(r.x, r.y, r.w * reveal, r.h); ctx.clip();
-    ctx.globalAlpha = o.alpha ?? 0.35;
+    if (calm) { ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip(); }
+    else { ctx.beginPath(); ctx.rect(r.x, r.y, r.w * reveal, r.h); ctx.clip(); }
+    const baseAlpha = (o.alpha ?? 0.35) * (calm ? reveal : 1);       // graphic cards fade in, no wipe edge
+    ctx.globalAlpha = baseAlpha;
     const sig = Math.floor(n * 0.62);
+    ctx.lineCap = 'butt'; ctx.lineJoin = 'round'; ctx.lineWidth = t;
     for (let i = 0; i < n; i++) {
       const base = r.y + (rise + i + 0.5) * pitch;
-      const shift = i * r.w * 0.006;
+      const shift = i * r.w * (calm ? 0.004 : 0.006);
       ctx.beginPath();
-      for (let x = r.x; x <= r.x + r.w + 2; x += 2) {
+      for (let x = r.x; x <= r.x + r.w + step; x += step) {
         const y = base + dy * ease((x - (xs + shift - w / 2)) / w);
         x === r.x ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
-      ctx.lineWidth = t; ctx.lineCap = 'butt'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = colour; ctx.globalAlpha = baseAlpha; ctx.stroke();
       if (o.signal !== false && i === sig) {
-        ctx.save(); ctx.globalAlpha = Math.min(1, (o.alpha ?? 0.35) * 2.4); ctx.strokeStyle = this.c.vermilion;
-        // the signal runs along its line once per bar
-        const run = ((o.beat ?? 0) / 4) % 1;
-        ctx.setLineDash([r.w * 0.28, r.w * 2]); ctx.lineDashOffset = -r.w * 2.28 * run + r.w * 0.28;
+        // the vermilion signal travels along its own line once per bar and pulses on each beat
+        const run = (beatPos / 4) % 1;
+        const len = r.w * 0.2 * (1 + 0.3 * pulse);
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, (calm ? 1 : (o.alpha ?? 0.35) * 2.4) * (0.75 + 0.25 * pulse) * (calm ? reveal : 1));
+        ctx.strokeStyle = this.c.vermilion;
+        ctx.lineWidth = t * (1 + 0.35 * pulse);
+        const head = r.x - len + (r.w + len) * run;
+        ctx.setLineDash([len, r.w * 4]); ctx.lineDashOffset = -(head - r.x);
         ctx.stroke(); ctx.restore();
-        ctx.strokeStyle = colour; ctx.stroke();
-      } else { ctx.strokeStyle = colour; ctx.stroke(); }
+      }
     }
     ctx.restore();
     this.geometry.push({ kind: 'graphic', name: 'flow', style: 'contour', status: 'assumed', ...r });
@@ -241,7 +258,8 @@ export class Renderer {
     // motion: in video, Contour is drawn as a smooth field that flows and breathes with the beat
     const anim = this.frame.flowAnim;
     if (anim && style === 'contour') {
-      return this.contourField(r, { color: cw.bars, alpha: 1, weight: 0.45, time: anim.time ?? 0, beat: anim.beat ?? 0, reveal: anim.progress, punch: 1.2 });
+      const lines = Math.max(6, Math.min(11, Math.round(r.h / (0.042 * this.u))));
+      return this.contourField(r, { color: cw.bars, alpha: 1, weight: 0.3, lines, time: anim.time ?? 0, beat: anim.beat ?? 0, reveal: anim.progress, calm: true });
     }
     const drawW = anim ? r.w * Math.min(1, Math.max(0, anim.progress)) : r.w;
     const shift = anim ? (anim.phase - 0.5) * 0.22 * r.w : 0;
@@ -588,7 +606,19 @@ const LAYOUTS = {
       maxW: W * (R.landscape ? 0.75 + 0.08 * R.relax : 1) - 2 * m, maxLines: 3 + (R.relax >= 2 ? 1 : 0), maxH: leadTop - 0.06 * u - hTop,
       ls: -0.025, lh: 0.95, breaks: true, color: 'black', on: fieldKey,
     });
-    const fy = hl.bottom + 0.06 * u, fh = leadTop - 0.08 * u - fy;
+    let fy = hl.bottom + 0.06 * u, fh = leadTop - 0.08 * u - fy;
+    if (frame.flowAnim && R.landscape && frame.flow) {
+      // wide video end cards: the band sits in the open right half, level with the lead and CTA
+      const x0 = Math.round(W * 0.5), top = hl.bottom + 0.08 * u, bottom = ctaTop - 0.05 * u;
+      if (bottom - top > 0.08 * u) R.flow({ x: x0, y: top, w: W - m - x0, h: bottom - top }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 7);
+      R.footer(yF);
+      return;
+    }
+    if (frame.flowAnim && fh > 0.08 * u) {
+      // video end cards: a calmer, shorter band, centred in the space between title and lead
+      const h2 = Math.max(Math.min(fh * 0.62, 0.16 * R.H), Math.min(fh, 0.09 * u));
+      fy += (fh - h2) / 2; fh = h2;
+    }
     if (frame.flow && fh > 0.08 * u) R.flow({ x: m, y: fy, w: W - 2 * m, h: fh }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 7);
     R.footer(yF);
   },
