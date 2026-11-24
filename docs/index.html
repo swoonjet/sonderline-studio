@@ -10,7 +10,7 @@
 <body>
 <header class="bar">
   <a class="brand" href="../"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="">Sonderline Social System</a>
-  <nav><a href="../">Overview</a><a href="./" aria-current="page">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio</a><a href="../video/">Video Studio</a></nav>
+  <nav><a href="../">Overview</a><a href="./" aria-current="page">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio</a><a href="../video/">Video Studio</a><a href="../deck/">Deck Studio</a></nav>
 </header>
 
 <div class="hero">
@@ -23,7 +23,7 @@
     <p class="label">On this page</p>
     <p><a href="#opportunity">1. Why start with social content</a><br><a href="#system">2. How the system works</a><br><a href="#tools">3. Tools and integrations</a><br><a href="#quality">4. Quality control and approvals</a><br><a href="#status">5. What works today and what is still a concept</a><br><a href="#adoption">6. Rolling it out to the team</a><br><a href="#impact">7. Expected impact</a><br><a href="#assumptions">8. Assumptions and sources</a></p>
     <p class="label" style="margin-top:28px">Download</p>
-    <p><a href="sonderline-system-overview.pdf">This page as PDF</a><br><a href="system-diagram.png">System diagram (PNG)</a></p>
+    <p><a href="sonderline-system-overview.pdf?v=a8e2d1e5c5">This page as PDF</a><br><a href="system-diagram.png?v=a219b767fb">System diagram (PNG)</a></p>
   </aside>
 </div>
 
@@ -64,6 +64,7 @@
     <tr><td><b>Intake</b></td><td>Studio brief panel</td><td>The team's existing request form (Asana, Jira or Airtable)</td><td>A webhook creates a draft job and links back to the ticket</td></tr>
     <tr><td><b>Brand rules</b></td><td>JSON files in this repository</td><td>The same files in a private Git repository, with pull requests approved by the brand lead</td><td>Every step reads the files at render time, so one change updates every output</td></tr>
     <tr><td><b>Drafting</b></td><td>Claude in the browser using the viewer's own API key, plus a rules-based offline drafter</td><td>Claude through the Anthropic API behind a small server, so keys are never in a browser, with prompts and specs logged</td><td>Structured output is validated against the spec schema</td></tr>
+    <tr><td><b>Design files</b></td><td>Figma brand kit built with FigCraft from the rule files</td><td>The same kit published as a Figma team library, regenerated when the rules change</td><td>Rules files feed the kit, so code and design files stay in step</td></tr>
     <tr><td><b>Composition</b></td><td>Canvas engine in the browser, plus headless Chromium for batch work (<code>tools/produce.py</code>)</td><td>The same engine run as a render service, with an optional Figma plugin to open a spec as editable frames</td><td>Spec in, images and layout geometry out</td></tr>
     <tr><td><b>Video footage</b></td><td>Short clips generated from the supplied stills with Google Veo 3.1 Fast through OpenRouter</td><td>The same approach on approved photography, or commissioned footage, with provenance recorded for each clip</td><td>Clips are stored as assets and used by the video layouts like photos</td></tr>
     <tr><td><b>Quality checks</b></td><td>Validator with a report and issue markers drawn on the artwork</td><td>The same validator, posting its report as a comment in the review tool</td><td>Failures block approval, and review items go to a named role</td></tr>
@@ -115,7 +116,9 @@
     <tr><td><b>Claude drafting</b> (brief to spec)</td><td><span class="status works">Works</span></td><td>Needs an Anthropic API key pasted into the Studio. Without a key, the offline rules drafter is used</td></tr>
     <tr><td><b>Pulse Video Studio</b> (web app)</td><td><span class="status works">Works</span></td><td>Scenes timed to the music's beat map, live preview with sound, checks for each scene, approvals and MP4 recording in the browser</td></tr>
     <tr><td><b>Motion engine</b></td><td><span class="status works">Works</span></td><td>Generated footage with overlays, eased type reveals and the Contour graphic, all timed to the music. MP4 masters are rendered with <code>tools/produce_video.py</code></td></tr>
-    <tr><td><b>Presentation slides</b></td><td><span class="status works">Works</span></td><td>16:9 slides from the same engine, exported as PNG and PDF. Editable PowerPoint export is not built yet</td></tr>
+    <tr><td><b>Pulse Deck Studio</b> (web app)</td><td><span class="status works">Works</span></td><td>Slides from the same engine and checks, with speaker notes. Exports an editable PowerPoint file (copy as text boxes in Inter Tight, the supplied logo, notes) and a PDF. Checked against PowerPoint's own rendering</td></tr>
+    <tr><td><b>Figma brand kit</b> (FigCraft)</td><td><span class="status works">Works</span></td><td>Built by a script from the same rule files: colour variables, Inter Tight text styles, logo and clearspace, components, templates at real sizes and examples, with its own QA pass</td></tr>
+    <tr><td><b>Claude skill</b> (<code>/sonderline</code>)</td><td><span class="status works">Works</span></td><td>Instructions that let Claude make and check Sonderline assets with this system, including the copy rules and the commands</td></tr>
     <tr><td><b>Intake webhooks, DAM, scheduler and single sign-on</b></td><td><span class="status concept">Concept</span></td><td>Standard integrations that depend on Sonderline's current tools</td></tr>
     <tr><td><b>Server-side drafting and audit log</b></td><td><span class="status concept">Concept</span></td><td>Needed before production so that API keys are not handled in browsers</td></tr>
     <tr><td><b>Figma round trip</b></td><td><span class="status concept">Concept</span></td><td>For designers who want to finish a spec by hand</td></tr>
@@ -175,7 +178,7 @@
         <li>Video footage: short clips generated from those two images with Google Veo 3.1 Fast through OpenRouter. They are AI-generated and fictional.</li>
         <li>Music: a track supplied by Jon Toews.</li>
         <li>Inter Tight by Rasmus Andersson, SIL Open Font License 1.1 (supplied).</li>
-        <li>JSZip 3.10.1 (MIT) for the Studio's zip export.</li>
+        <li>JSZip 3.10.1 (MIT) for the Studio's zip export, PptxGenJS 3.12.0 (MIT) and jsPDF 2.5.1 (MIT) for deck export.</li>
         <li>Built with Claude (Anthropic) as a coding partner. The drafting step uses Claude Opus 5.5.</li>
       </ul>
     </div>

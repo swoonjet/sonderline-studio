@@ -157,3 +157,95 @@ export function draftOffline(brand, request) {
   };
   return toSpec(d, request, { by: 'Offline drafter (rules, no AI)', rationale: 'Keyword routing to approved lines. Add a Claude key for real drafting.', copy_gaps: [] });
 }
+
+// ---------- decks ----------
+const DECK_LAYOUTS = ['full-bleed', 'contour-title', 'photo-hero', 'signal-grid', 'scene-story', 'scene-invite', 'type-led'];
+const SLIDE_FIELDS = ['label', 'headline', 'lead', 'cta', 'status_label', 'status'];
+
+const DECK_SCHEMA = {
+  type: 'object', additionalProperties: false, required: ['title', 'rationale', 'slides', 'copy_gaps'],
+  properties: {
+    title: { type: 'string' }, rationale: { type: 'string' },
+    copy_gaps: { type: 'array', items: { type: 'string' } },
+    slides: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false, required: ['layout', 'photo', 'notes', ...SLIDE_FIELDS],
+        properties: {
+          layout: { type: 'string', enum: DECK_LAYOUTS },
+          photo: { type: 'string', enum: ['none', 'motion-study', 'material-study'] },
+          notes: { type: 'string' },
+          ...Object.fromEntries(SLIDE_FIELDS.map(k => [k, { type: 'string' }])),
+        },
+      },
+    },
+  },
+};
+
+function deckFromDraft(d, request, source) {
+  return {
+    id: `deck-${Date.now().toString(36)}`, title: d.title, kind: 'deck', request, formats: ['slide'],
+    content: { footer_label: 'OPERATIONS / PERSPECTIVE' },
+    frames: d.slides.map(s => {
+      const content = Object.fromEntries(SLIDE_FIELDS.filter(k => s[k]).map(k => [k, s[k]]));
+      const fr = { layout: s.layout, content, notes: s.notes };
+      if (['full-bleed', 'photo-hero', 'scene-story'].includes(s.layout)) {
+        fr.photo = { id: s.photo === 'none' ? 'motion-study' : s.photo, focus: [0.3, 0.5], zoom: 1 };
+        fr.scrim = 'auto';
+      }
+      if (['contour-title', 'type-led'].includes(s.layout)) { fr.field = 'lavender'; fr.flowStyle = 'contour'; fr.flow = s.layout === 'type-led' ? true : undefined; }
+      return fr;
+    }),
+    draftedBy: source,
+  };
+}
+
+export async function draftDeckWithClaude(brand, request, apiKey) {
+  const system = `${systemPrompt(brand)}
+
+You are drafting a 16:9 presentation, not a social post. Return 4 to 8 slides. Slide layouts:
+- full-bleed: photo with a headline (and optional label). Good for the title slide.
+- contour-title: a statement with a lead line on a colour field with the Contour graphic.
+- photo-hero: photo with headline, plus a panel with label, lead, call to action, status label and status.
+- signal-grid: the four Pulse signals as tiles, with headline, lead and call to action. Use once.
+- scene-story: headline, a photo band, and a panel with a label and lead.
+- scene-invite: the closing slide with headline, call to action and status.
+- type-led: a statement with lead and call to action on a colour field.
+Every on-slide line must be copied verbatim from the approved library. Leave fields empty ("") when a layout doesn't use them. Speaker notes are plain sentences for the presenter and may be your own words, but must not add claims.`;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2026-10-21',
+      'anthropic-beta': 'server-side-fallback-2026-07-01', 'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: MODEL, max_tokens: 16000, fallbacks: 'default',
+      output_config: { effort: 'medium', format: { type: 'json_schema', schema: DECK_SCHEMA } },
+      system, messages: [{ role: 'user', content: `Deck brief from ${request.requester || 'the team'} for ${request.channel || 'a meeting'}:\n\n${request.brief}` }],
+    }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body?.error?.message || `API error ${res.status}`);
+  if (body.stop_reason === 'refusal') throw new Error('Claude declined this brief. Rephrase it or build the deck by hand.');
+  if (body.stop_reason === 'max_tokens') throw new Error('The draft was cut off. Try again.');
+  const d = JSON.parse(body.content.find(b => b.type === 'text')?.text);
+  return deckFromDraft(d, request, { by: `Claude (${body.model || MODEL})`, rationale: d.rationale, copy_gaps: d.copy_gaps });
+}
+
+// Offline: a standard deck structure from approved lines, trimmed to the length the brief asks for.
+export function draftDeckOffline(brand, request) {
+  const b = (request.brief || '').toLowerCase();
+  const p = brand.copy.product;
+  const slides = [
+    { layout: 'full-bleed', photo: 'motion-study', label: 'SONDERLINE PULSE', headline: 'Every site. One view.', notes: 'Introduce Pulse with the brand line.' },
+    { layout: 'contour-title', photo: 'none', label: 'SONDERLINE PULSE / OVERVIEW', headline: 'The operations perspective.', lead: p.description, notes: 'What Pulse is.' },
+    { layout: 'photo-hero', photo: 'material-study', label: 'SONDERLINE PULSE', headline: 'A clearer view.', lead: 'For organizations managing multiple locations.', cta: p.cta, status_label: 'PILOT STATUS', status: p.status, notes: 'Who it is for.' },
+    { layout: 'signal-grid', photo: 'none', label: 'SONDERLINE PULSE / PRODUCT PERSPECTIVE', headline: 'Site signals.', lead: 'One consolidated view across your locations.', cta: p.cta, notes: 'What Pulse brings together.' },
+    { layout: 'scene-story', photo: 'motion-study', label: 'SONDERLINE PULSE', headline: 'Keep the details connected.', status_label: 'THE OPERATIONAL VIEW', lead: 'Site activity. Service requests. Escalations. Team updates.', notes: 'How the details stay connected.' },
+    { layout: 'scene-invite', photo: 'none', label: 'SONDERLINE PULSE', headline: 'Meet Pulse.', cta: p.cta, status: p.status, notes: 'Invite them to request a demo.' },
+  ];
+  const short = /short|quick|three|3[- ]slide|brief intro/.test(b);
+  const chosen = short ? [slides[0], slides[3], slides[5]] : slides;
+  const d = { title: request.title || (short ? 'Pulse introduction (3 slides)' : 'Pulse overview deck'), slides: chosen.map(s => ({ lead: '', cta: '', status_label: '', status: '', label: '', ...s })) };
+  return deckFromDraft(d, request, { by: 'Offline drafter (rules, no AI)', rationale: 'Standard deck structure from approved lines. Add a Claude key for real drafting.', copy_gaps: [] });
+}

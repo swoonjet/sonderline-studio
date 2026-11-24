@@ -806,8 +806,14 @@ const LAYOUTS = {
       maxW: W * (R.landscape ? 0.62 : 1) - 2 * m, maxLines: 3 + R.relax, maxH: (bottom - hTop) * 0.55,
       ls: -0.02, lh: 0.97, breaks: true, color: ink, on: fieldKey,
     });
-    const fy = hl.bottom + 0.07 * u, fh = bottom - fy;
-    if (frame.flow !== false && fh > 0.08 * u) R.flow({ x: 0, y: fy, w: W, h: fh }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 9, frame.flowStyle || 'contour');
+    if (R.landscape) {
+      // wide formats: the band sits in the open right half, below the title and beside the lead
+      const x0 = Math.round(W * 0.6), top = hl.bottom + 0.07 * u, bot = yF - m;
+      if (frame.flow !== false && bot - top > 0.08 * u) R.flow({ x: x0, y: top, w: W - m - x0, h: bot - top }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 9, frame.flowStyle || 'contour');
+    } else {
+      const fy = hl.bottom + 0.07 * u, fh = bottom - fy;
+      if (frame.flow !== false && fh > 0.08 * u) R.flow({ x: 0, y: fy, w: W, h: fh }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 9, frame.flowStyle || 'contour');
+    }
     R.footer(yF);
   },
 

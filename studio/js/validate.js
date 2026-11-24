@@ -217,6 +217,7 @@ export function validateSpecCopy(spec, brand) {
     });
   } else checks.push({ id: 'caption', title: 'Caption uses approved claims', page: 13, status: 'review', detail: 'No caption yet.', gate: 'Requester' });
 
+  if (spec.kind === 'deck') return summarise(checks);   // slides carry speaker notes, not post copy
   const alt = spec.alt ? norm(spec.alt) : '';
   const forbidden = alt && brand.copy.forbidden_patterns.find(f => new RegExp(f.pattern.replace('(?i)', ''), f.pattern.startsWith('(?i)') ? 'i' : '').test(alt));
   checks.push({

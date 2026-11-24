@@ -13,3 +13,5 @@ _notes/
 out/
 studio/specs/_matrix/
 assets/video/raw/
+assets/video/hq/
+__pycache__/

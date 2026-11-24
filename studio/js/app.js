@@ -219,8 +219,17 @@ function showSelected() {
   const o = outputs[sel];
   if (!o) return;
   const big = $('#big'), ov = $('#overlay');
-  big.width = ov.width = o.canvas.width; big.height = ov.height = o.canvas.height;
-  big.getContext('2d').drawImage(o.canvas, 0, 0);
+  // draw at display size with high-quality resampling (a CSS-scaled canvas aliases thin lines)
+  const area = big.parentElement.parentElement.getBoundingClientRect();
+  const k = Math.min((area.width - 40) / o.canvas.width, (window.innerHeight * 0.62) / o.canvas.height, 1);
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = Math.round(o.canvas.width * k), cssH = Math.round(o.canvas.height * k);
+  big.width = Math.round(cssW * dpr); big.height = Math.round(cssH * dpr);
+  big.style.width = ov.style.width = `${cssW}px`; big.style.height = ov.style.height = `${cssH}px`;
+  const bctx = big.getContext('2d');
+  bctx.imageSmoothingEnabled = true; bctx.imageSmoothingQuality = 'high';
+  bctx.drawImage(o.canvas, 0, 0, big.width, big.height);
+  ov.width = o.canvas.width; ov.height = o.canvas.height;
   const ctx = ov.getContext('2d');
   ctx.clearRect(0, 0, ov.width, ov.height);
   if ($('#showOverlay').checked) {

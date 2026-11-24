@@ -2,15 +2,7 @@
   "spec": "d3-product-perspective",
   "copy": {
     "status": "pass",
-    "checks": [
-      {
-        "id": "alt",
-        "title": "Alt text present and factual",
-        "page": 6,
-        "status": "pass",
-        "detail": "274 characters."
-      }
-    ]
+    "checks": []
   },
   "frames": {
     "slide-01": {
@@ -40,22 +32,22 @@
             "title": "Approved text/background pairings",
             "page": 6,
             "status": "pass",
-            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "detail": "Black text on light and accent fields, white text on black and on photography.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "palette",
-            "title": "Fields use the five brand colours",
+            "title": "Colour fields use the brand palette",
             "page": 3,
             "status": "pass",
-            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "detail": "Only black, white, lavender, cool grey and vermilion are used.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "vermilion",
-            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "title": "Vermilion is at or below 5% of the frame",
             "page": 4,
             "status": "pass",
             "detail": "0.3% of pixels (target about 3%).",
@@ -73,16 +65,16 @@
           },
           {
             "id": "fit",
-            "title": "Text fits, nothing collides",
+            "title": "Text fits without overlapping",
             "page": 7,
             "status": "pass",
-            "detail": "All copy fits its box at a legible size.",
+            "detail": "All copy fits its area at a legible size.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "size",
-            "title": "Type no smaller than micro-label size",
+            "title": "Type is no smaller than the guide's micro-labels",
             "page": 5,
             "status": "pass",
             "detail": "Smallest 25px (min 23px).",
@@ -91,7 +83,7 @@
           },
           {
             "id": "logo",
-            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "title": "Logo uses the supplied art with h/2 clearspace",
             "page": 2,
             "status": "pass",
             "detail": "Supplied lockup, 69px visible height, clearspace clear.",
@@ -118,7 +110,7 @@
           },
           {
             "id": "footer",
-            "title": "One frame, clear footer",
+            "title": "Black footer with the logo",
             "page": 7,
             "status": "pass",
             "detail": "Black footer with logo.",
@@ -127,7 +119,7 @@
           },
           {
             "id": "photo",
-            "title": "Photography: supplied, sharp enough",
+            "title": "Photography is supplied and not over-enlarged",
             "page": 8,
             "status": "pass",
             "detail": "motion-study at 125%. Fictional, AI-generated images supplied with the kit: disclose and never use as customer evidence.",
@@ -167,22 +159,22 @@
             "title": "Approved text/background pairings",
             "page": 6,
             "status": "pass",
-            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "detail": "Black text on light and accent fields, white text on black and on photography.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "palette",
-            "title": "Fields use the five brand colours",
+            "title": "Colour fields use the brand palette",
             "page": 3,
             "status": "pass",
-            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "detail": "Only black, white, lavender, cool grey and vermilion are used.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "vermilion",
-            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "title": "Vermilion is at or below 5% of the frame",
             "page": 4,
             "status": "pass",
             "detail": "0.2% of pixels (target about 3%).",
@@ -200,16 +192,16 @@
           },
           {
             "id": "fit",
-            "title": "Text fits, nothing collides",
+            "title": "Text fits without overlapping",
             "page": 7,
             "status": "pass",
-            "detail": "All copy fits its box at a legible size.",
+            "detail": "All copy fits its area at a legible size.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "size",
-            "title": "Type no smaller than micro-label size",
+            "title": "Type is no smaller than the guide's micro-labels",
             "page": 5,
             "status": "pass",
             "detail": "Smallest 25px (min 23px).",
@@ -218,7 +210,7 @@
           },
           {
             "id": "logo",
-            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "title": "Logo uses the supplied art with h/2 clearspace",
             "page": 2,
             "status": "pass",
             "detail": "Supplied lockup, 69px visible height, clearspace clear.",
@@ -245,7 +237,7 @@
           },
           {
             "id": "footer",
-            "title": "One frame, clear footer",
+            "title": "Black footer with the logo",
             "page": 7,
             "status": "pass",
             "detail": "Black footer with logo.",
@@ -283,22 +275,22 @@
             "title": "Approved text/background pairings",
             "page": 6,
             "status": "pass",
-            "detail": "Black on light and accent fields, white on black and over photography only.",
+            "detail": "Black text on light and accent fields, white text on black and on photography.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "palette",
-            "title": "Fields use the five brand colours",
+            "title": "Colour fields use the brand palette",
             "page": 3,
             "status": "pass",
-            "detail": "Black, white, lavender, cool grey, vermilion only.",
+            "detail": "Only black, white, lavender, cool grey and vermilion are used.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "vermilion",
-            "title": "Vermilion is a signal (\u2264 5% of the frame)",
+            "title": "Vermilion is at or below 5% of the frame",
             "page": 4,
             "status": "pass",
             "detail": "0.3% of pixels (target about 3%).",
@@ -316,16 +308,16 @@
           },
           {
             "id": "fit",
-            "title": "Text fits, nothing collides",
+            "title": "Text fits without overlapping",
             "page": 7,
             "status": "pass",
-            "detail": "All copy fits its box at a legible size.",
+            "detail": "All copy fits its area at a legible size.",
             "boxes": [],
             "gate": null
           },
           {
             "id": "size",
-            "title": "Type no smaller than micro-label size",
+            "title": "Type is no smaller than the guide's micro-labels",
             "page": 5,
             "status": "pass",
             "detail": "Smallest 25px (min 23px).",
@@ -334,7 +326,7 @@
           },
           {
             "id": "logo",
-            "title": "Logo: supplied art, h/2 clearspace, legible",
+            "title": "Logo uses the supplied art with h/2 clearspace",
             "page": 2,
             "status": "pass",
             "detail": "Supplied lockup, 69px visible height, clearspace clear.",
@@ -361,7 +353,7 @@
           },
           {
             "id": "footer",
-            "title": "One frame, clear footer",
+            "title": "Black footer with the logo",
             "page": 7,
             "status": "pass",
             "detail": "Black footer with logo.",

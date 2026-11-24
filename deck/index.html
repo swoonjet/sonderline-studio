@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pulse Deck Studio</title>
+<link rel="stylesheet" href="../studio/css/studio.css">
+<link rel="stylesheet" href="../video/video.css">
+<link rel="stylesheet" href="deck.css">
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="" class="sym"><strong>Pulse Deck Studio</strong><span class="muted">Sonderline presentation prototype</span></div>
+  <nav><a href="../">Overview</a><a href="../docs/">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio</a><a href="../video/">Video Studio</a></nav>
+</header>
+
+<ol class="steps" aria-label="Workflow">
+  <li><b>1</b> Brief</li><li><b>2</b> Slides</li><li><b>3</b> Preview</li><li><b>4</b> Check</li><li><b>5</b> Approve and export</li>
+</ol>
+
+<main class="grid">
+  <section class="col left">
+    <h2><b>1</b> Brief</h2>
+    <label>Start from
+      <select id="preset">
+        <option value="../studio/specs/d6-pilot-deck.json">D6 · Pilot overview · 6 slides</option>
+        <option value="../studio/specs/d3-product-perspective.json">D3 · Product perspective · 3 slides</option>
+        <option value="new">New brief…</option>
+      </select>
+    </label>
+    <div class="row2">
+      <label>Requester<input id="requester" placeholder="e.g. Sales enablement"></label>
+      <label>Used for<input id="channel" placeholder="e.g. pilot meetings"></label>
+    </div>
+    <label>Brief<textarea id="brief" rows="4" placeholder="Who is the deck for, and what should it cover?"></textarea></label>
+    <details id="keybox">
+      <summary>Claude API key <span class="muted">(optional, for live drafting)</span></summary>
+      <input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <p class="fine">Kept in this tab's memory only and sent only to api.anthropic.com. Without a key, the offline drafter builds a standard deck from approved lines.</p>
+    </details>
+    <button id="draft" class="primary">Draft deck</button>
+    <p id="draftStatus" class="fine" role="status"></p>
+
+    <h2><b>2</b> Slides <span class="muted" id="slideMeta"></span></h2>
+    <div id="slides"></div>
+    <div class="addrow">
+      <select id="addLayout"></select>
+      <button id="addSlide">Add slide</button>
+    </div>
+    <details>
+      <summary>Deck spec JSON</summary>
+      <textarea id="json" rows="14" spellcheck="false"></textarea>
+      <button id="applyJson">Apply JSON</button>
+    </details>
+  </section>
+
+  <section class="col mid">
+    <h2><b>3</b> Preview <span class="muted" id="meta"></span></h2>
+    <div class="stage"><div class="stageInner"><canvas id="view"></canvas></div></div>
+    <div class="stageBar">
+      <span class="fine">Use the arrow keys to move between slides.</span>
+      <span id="notesView" class="fine"></span>
+    </div>
+    <div id="thumbs" class="thumbs deckthumbs"></div>
+  </section>
+
+  <section class="col right">
+    <h2><b>4</b> Check <span id="overall" class="chip"></span></h2>
+    <div id="checks"></div>
+
+    <h2><b>5</b> Approve and export</h2>
+    <div id="gates"></div>
+    <button id="pptx" class="primary" disabled>Export PowerPoint (.pptx)</button>
+    <button id="pdf" disabled>Export PDF</button>
+    <p id="exportStatus" class="fine"></p>
+    <p class="fine">The PowerPoint file is editable: every line of copy is a text box in Inter Tight (install the font from the brand kit to see it exactly), the logo is the supplied artwork, and speaker notes are included. Colour fields, photos and graphics are a background picture on each slide.</p>
+  </section>
+</main>
+
+<footer class="foot fine">Prototype by Jon Toews for SketchDeck. Sonderline is a fictional brand. The photography supplied with the brand kit is AI-generated. Contour is a proposed flow graphic based on the S symbol. Inter Tight, SIL OFL 1.1. Exports use PptxGenJS (MIT) and jsPDF (MIT).</footer>
+<script type="module" src="deck-app.js"></script>
+</body>
+</html>

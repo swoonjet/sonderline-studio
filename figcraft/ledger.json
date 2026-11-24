@@ -1,0 +1,100 @@
+{
+ "pages": {
+  "Cover": 1,
+  "Foundations": 2,
+  "Components": 3,
+  "Templates": 4,
+  "Examples": 5
+ },
+ "variables": {
+  "black": "VariableID:1",
+  "white": "VariableID:2",
+  "lavender": "VariableID:3",
+  "vermilion": "VariableID:4",
+  "cool grey": "VariableID:5",
+  "margin": "VariableID:6",
+  "rule": "VariableID:7",
+  "info padding": "VariableID:8"
+ },
+ "styles": {
+  "Display": "S:1",
+  "Headline": "S:2",
+  "Lead": "S:3",
+  "Body": "S:4",
+  "Status": "S:5",
+  "CTA": "S:6",
+  "Detail": "S:7",
+  "List": "S:8",
+  "List current": "S:9",
+  "Label": "S:10",
+  "Footer label": "S:11"
+ },
+ "components": {
+  "_backdrops": [
+   54,
+   66
+  ],
+  "Logo / Lockup": 53,
+  "Logo / Symbol": 65,
+  "Arrow": 70,
+  "Label": 72,
+  "CTA": 74,
+  "Vermilion mark": 84,
+  "Footer bar": 88,
+  "Info row": 161,
+  "Signal item": 171,
+  "Photo frame": 177,
+  "Contour": 217,
+  "_done": true
+ },
+ "component_notes": [
+  17,
+  20,
+  67,
+  78,
+  85,
+  104,
+  162,
+  172,
+  178
+ ],
+ "templates": {
+  "_note": 218,
+  "Social feed 4:5 \u00b7 Photo hero": 221,
+  "Square 1:1 \u00b7 Photo hero": 255,
+  "Link card 1.91:1": 289,
+  "Story 9:16 \u00b7 Photo hero": 329,
+  "Carousel cover 4:5 \u00b7 Type-led": 364,
+  "Carousel frame 4:5 \u00b7 Signal": 400,
+  "Slide 16:9 \u00b7 Photo title": 435,
+  "Slide 16:9 \u00b7 Signal grid": 475,
+  "Slide 16:9 \u00b7 End": 517,
+  "_safe": [
+   545,
+   546,
+   547,
+   548
+  ]
+ },
+ "cover": 549,
+ "board": 569,
+ "examples": [
+  805,
+  808,
+  810,
+  811,
+  812,
+  813,
+  814,
+  816,
+  817,
+  818,
+  819,
+  820,
+  821,
+  822,
+  824,
+  825,
+  826
+ ]
+}

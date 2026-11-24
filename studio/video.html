@@ -17,7 +17,8 @@
       if (!sc.clip || sc.continuous) continue;
       const v = document.createElement('video');
       v.muted = true; v.preload = 'auto'; v.playsInline = true;
-      v.src = `../assets/video/${sc.clip.name}.webm`;
+      // masters render from near-lossless footage (assets/video/hq, made locally from the raw clips)
+      v.src = `../assets/video/${q.get('hq') ? 'hq/' : ''}${sc.clip.name}.webm`;
       await new Promise((res, rej) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', () => rej(new Error(`Could not load ${sc.clip.name}`)), { once: true }); });
       els[sc.index] = v;
     }
@@ -27,7 +28,7 @@
     window.__video = {
       spec, fps: mr.fps, total: Math.round(mr.tl.total * mr.fps), seconds: mr.tl.total, bpm: mr.tl.bpm,
       music: mr.tl.music ? mr.tl.music.file : null,
-      async frame(i) { await mr.frameAt((i + 0.5) / mr.fps, out); return out.toDataURL('image/jpeg', 0.93); },
+      async frame(i) { await mr.frameAt((i + 0.5) / mr.fps, out); return out.toDataURL('image/png'); },   // lossless into the encoder
       async held() {
         const outs = [];
         for (const [k, sc] of mr.tl.scenes.entries()) {

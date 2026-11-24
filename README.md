@@ -7,6 +7,7 @@ Claude drafts a spec from the approved copy library, a layout engine renders eac
 - Live site: https://jontoews.com/sonderline-studio/
 - Social Studio (stills): https://jontoews.com/sonderline-studio/studio/
 - Video Studio (motion + music): https://jontoews.com/sonderline-studio/video/
+- Deck Studio (slides, PowerPoint, PDF): https://jontoews.com/sonderline-studio/deck/
 - System overview: https://jontoews.com/sonderline-studio/docs/
 - Deliverables: https://jontoews.com/sonderline-studio/deliverables/
 
@@ -31,6 +32,11 @@ rules/*.json (tokens, approved copy, formats) ─► every step
 | `video/` | Pulse Video Studio web app |
 | `tools/produce_video.py` | Video spec → MP4 (H.264 + AAC music), frame by frame, with per-scene checks |
 | `tools/gen_video_assets.py` | Generates footage from the supplied stills (Google Veo 3.1 Fast via OpenRouter) into `assets/video/` |
+| `deck/` | Pulse Deck Studio web app |
+| `studio/js/export-deck.js` | Editable PowerPoint (PptxGenJS) and PDF (jsPDF) export |
+| `tools/produce_deck.py` | Deck spec → PNGs, .pptx and .pdf |
+| `figcraft/` | Figma brand kit built with FigCraft (`build_kit.py`, `sonderline-brand-kit.figcraft`, previews) |
+| `skills/sonderline/SKILL.md` | Claude skill for making Sonderline assets (copy to `~/.claude/skills/sonderline/`) |
 | `deliverables/`, `review/` | Outputs, reports and zips |
 | `docs/` | System overview |
 | `brand-kit/` | The supplied Sonderline kit (unchanged) |

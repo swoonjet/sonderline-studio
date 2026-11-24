@@ -32,7 +32,8 @@
         "cta": "Request a Pulse demo.",
         "status_label": "PILOT STATUS",
         "status": "Early-access pilots planned for Q1 2027."
-      }
+      },
+      "notes": "Open on the brand line and the pilot status."
     },
     {
       "layout": "signal-grid",
@@ -41,7 +42,8 @@
         "headline": "Site signals.",
         "lead": "One consolidated view across your locations.",
         "cta": "Request a Pulse demo."
-      }
+      },
+      "notes": "What Pulse brings together, and the three capabilities."
     },
     {
       "layout": "type-led",
@@ -53,9 +55,11 @@
         "headline": "Meet Pulse.",
         "lead": "Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates.",
         "cta": "Request a Pulse demo."
-      }
+      },
+      "notes": "Close with the invitation to request a demo."
     }
   ],
   "caption": "",
-  "alt": "Three slides. 1: Progress, in view, over a motion photograph, with Every site. One view. 2: Site signals, with tiles for site activity, service requests, escalations and team updates, and the three capabilities. 3: Meet Pulse, with the demo request. Sonderline logo on each."
+  "alt": "Three slides. 1: Progress, in view, over a motion photograph, with Every site. One view. 2: Site signals, with tiles for site activity, service requests, escalations and team updates, and the three capabilities. 3: Meet Pulse, with the demo request. Sonderline logo on each.",
+  "kind": "deck"
 }

@@ -46,6 +46,24 @@ let brand, tracks, clips, approved, fixer, spec, mr, report;
 let sel = 0, playing = false, T = 0, approvals = {}, approvedHash = null, busy = false;
 let actx, buffers = {}, source = null, gain = null, t0 = 0, onEnded = null;
 const screen = $('#screen');
+const view = $('#view');
+
+// Show the full-resolution frame at the size it is displayed, with high-quality resampling,
+// so thin lines and fine textures don't alias the way a CSS-scaled canvas does.
+function present() {
+  const box = view.parentElement.parentElement.getBoundingClientRect();
+  const maxW = Math.max(200, box.width - 40), maxH = window.innerHeight * 0.64;
+  const k = Math.min(maxW / screen.width, maxH / screen.height, 1);
+  const cssW = Math.round(screen.width * k), cssH = Math.round(screen.height * k), dpr = window.devicePixelRatio || 1;
+  if (view.width !== Math.round(cssW * dpr) || view.height !== Math.round(cssH * dpr)) {
+    view.width = Math.round(cssW * dpr); view.height = Math.round(cssH * dpr);
+    view.style.width = `${cssW}px`; view.style.height = `${cssH}px`;
+  }
+  const ctx = view.getContext('2d');
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(screen, 0, 0, view.width, view.height);
+}
+window.addEventListener('resize', () => present());
 const videos = {};          // `${sceneIndex}:${clip}` -> <video>
 
 // ---------- footage ----------
@@ -294,6 +312,7 @@ async function draw() {
   drawing = true;
   try {
     const { scene } = await mr.frameAt(T, screen);
+    present();
     const beat = Math.floor((T - scene.start) / mr.tl.beat) + 1;
     $('#clock').textContent = `${T.toFixed(1)}s / ${mr.tl.total.toFixed(1)}s · scene ${scene.index + 1} · beat ${beat}`;
     $('#scrub').value = Math.round((T / mr.tl.total) * 1000);

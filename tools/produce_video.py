@@ -28,7 +28,8 @@ def main():
         for spec_path in args.specs:
             rel = pathlib.Path(spec_path).resolve().relative_to(ROOT / "studio")
             page = browser.new_page()
-            page.goto(f"http://127.0.0.1:{httpd.server_address[1]}/studio/video.html?spec={rel.as_posix()}")
+            hq = "&hq=1" if (ROOT / "assets/video/hq").exists() and any((ROOT / "assets/video/hq").glob("*.webm")) else ""
+            page.goto(f"http://127.0.0.1:{httpd.server_address[1]}/studio/video.html?spec={rel.as_posix()}{hq}")
             page.wait_for_function("window.__video", timeout=300_000)
             v = page.evaluate("({error: window.__video.error, total: window.__video.total, fps: window.__video.fps, seconds: window.__video.seconds, bpm: window.__video.bpm, music: window.__video.music, spec: window.__video.spec, copy: window.__video.copy})")
             if v.get("error"):
@@ -47,13 +48,15 @@ def main():
             with tempfile.TemporaryDirectory() as tmp:
                 for i in range(v["total"]):
                     data = page.evaluate(f"window.__video.frame({i})")
-                    (pathlib.Path(tmp) / f"f{i:05d}.jpg").write_bytes(base64.b64decode(data.split(",", 1)[1]))
+                    (pathlib.Path(tmp) / f"f{i:05d}.png").write_bytes(base64.b64decode(data.split(",", 1)[1]))
                 mp4 = out / f"{spec['id']}.mp4"
-                cmd = ["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(v["fps"]), "-i", f"{tmp}/f%05d.jpg"]
+                cmd = ["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(v["fps"]), "-i", f"{tmp}/f%05d.png"]
                 if v["music"]:
                     fade = max(0.0, v["seconds"] - 1.6)
                     cmd += ["-i", str(ROOT / v["music"]), "-af", f"afade=t=out:st={fade:.2f}:d=1.6", "-c:a", "aac", "-b:a", "192k", "-shortest"]
-                cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "slow", "-movflags", "+faststart",
+                # high-quality delivery encode: low CRF, adaptive quantisation for flat colour fields, 2 s GOP
+                cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-profile:v", "high", "-crf", "14", "-preset", "slow",
+                        "-x264-params", "aq-mode=3:aq-strength=0.9:deblock=-1,-1", "-g", "48", "-movflags", "+faststart",
                         "-t", f"{v['seconds']:.3f}", str(mp4)]
                 subprocess.run(cmd, check=True)
             page.close()

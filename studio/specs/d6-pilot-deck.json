@@ -1,0 +1,106 @@
+{
+  "id": "d6-pilot-deck",
+  "title": "Pilot overview deck: six slides",
+  "kind": "deck",
+  "request": {
+    "requester": "Sales enablement",
+    "channel": "16:9 deck for early-access pilot meetings, shared as PowerPoint and PDF",
+    "brief": "A short deck for first meetings with operations leaders: what Pulse is, who it is for, what it brings together, the capabilities, and how to join the early-access pilots."
+  },
+  "formats": [
+    "slide"
+  ],
+  "content": {
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "frames": [
+    {
+      "layout": "full-bleed",
+      "photo": {
+        "id": "motion-study",
+        "focus": [
+          0.3,
+          0.5
+        ],
+        "zoom": 1
+      },
+      "scrim": "auto",
+      "content": {
+        "label": "SONDERLINE PULSE",
+        "headline": "Every site. One view."
+      },
+      "notes": "Introduce Pulse with the brand line. Keep it short."
+    },
+    {
+      "layout": "contour-title",
+      "field": "lavender",
+      "flowStyle": "contour",
+      "content": {
+        "label": "SONDERLINE PULSE / OVERVIEW",
+        "headline": "The operations perspective.",
+        "lead": "Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates."
+      },
+      "notes": "What Pulse is, in one sentence from the approved copy."
+    },
+    {
+      "layout": "photo-hero",
+      "photo": {
+        "id": "material-study",
+        "focus": [
+          0.3,
+          0.8
+        ],
+        "zoom": 1.25
+      },
+      "scrim": "auto",
+      "accent": "coolgrey",
+      "content": {
+        "headline": "A clearer view.",
+        "label": "SONDERLINE PULSE",
+        "lead": "For organizations managing multiple locations.",
+        "cta": "Request a Pulse demo.",
+        "status_label": "PILOT STATUS",
+        "status": "Early-access pilots planned for Q1 2027."
+      },
+      "notes": "Who it is for: organisations with many sites."
+    },
+    {
+      "layout": "signal-grid",
+      "content": {
+        "label": "SONDERLINE PULSE / PRODUCT PERSPECTIVE",
+        "headline": "Site signals.",
+        "lead": "One consolidated view across your locations.",
+        "cta": "Request a Pulse demo."
+      },
+      "notes": "The four things Pulse brings together, and the three capabilities."
+    },
+    {
+      "layout": "scene-story",
+      "photo": {
+        "id": "motion-study",
+        "focus": [
+          0.5,
+          0.5
+        ],
+        "zoom": 1.2
+      },
+      "content": {
+        "label": "SONDERLINE PULSE",
+        "headline": "Keep the details connected.",
+        "status_label": "THE OPERATIONAL VIEW",
+        "lead": "Site activity. Service requests. Escalations. Team updates."
+      },
+      "notes": "How the details stay connected across sites."
+    },
+    {
+      "layout": "scene-invite",
+      "content": {
+        "label": "SONDERLINE PULSE",
+        "headline": "Meet Pulse.",
+        "cta": "Request a Pulse demo.",
+        "status": "Early-access pilots planned for Q1 2027."
+      },
+      "notes": "Invite them to request a demo and join the pilots."
+    }
+  ]
+}
