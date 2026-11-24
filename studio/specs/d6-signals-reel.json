@@ -1,0 +1,29 @@
+{
+  "id": "d6-signals-reel",
+  "title": "Site signals: 16-second vertical reel",
+  "kind": "video",
+  "request": {
+    "requester": "Brand / social team",
+    "channel": "Instagram Reels, LinkedIn vertical video, 9:16",
+    "brief": "A fast vertical explainer of what Pulse brings together, one signal per beat-cut, ending on the invitation."
+  },
+  "format": "story",
+  "music": "signal",
+  "content": { "footer_label": "OPERATIONS / PERSPECTIVE" },
+  "scenes": [
+    { "layout": "contour-title", "beats": 8, "field": "lavender",
+      "content": { "label": "SONDERLINE PULSE / PRODUCT PERSPECTIVE", "headline": "Site signals.", "lead": "One consolidated view across your locations." } },
+    { "layout": "signal", "beats": 4, "field": "white", "index": "01 / 04", "photo": { "id": "material-study", "zoom": 1.6 }, "pan": [[0.05, 0.5], [0.27, 0.5]],
+      "content": { "label": "THE OPERATIONAL VIEW", "signal": "Site activity" } },
+    { "layout": "signal", "beats": 4, "field": "lavender", "index": "02 / 04", "photo": { "id": "material-study", "zoom": 1.6 }, "pan": [[0.27, 0.5], [0.5, 0.5]],
+      "content": { "label": "THE OPERATIONAL VIEW", "signal": "Service requests" } },
+    { "layout": "signal", "beats": 4, "field": "coolgrey", "index": "03 / 04", "photo": { "id": "material-study", "zoom": 1.6 }, "pan": [[0.5, 0.5], [0.73, 0.5]],
+      "content": { "label": "THE OPERATIONAL VIEW", "signal": "Escalations" } },
+    { "layout": "signal", "beats": 4, "field": "white", "index": "04 / 04", "photo": { "id": "material-study", "zoom": 1.6 }, "pan": [[0.73, 0.5], [0.95, 0.5]],
+      "content": { "label": "THE OPERATIONAL VIEW", "signal": "Team updates" } },
+    { "layout": "scene-invite", "beats": 8,
+      "content": { "label": "SONDERLINE PULSE", "headline": "Meet Pulse.", "cta": "Request a Pulse demo.", "status": "Early-access pilots planned for Q1 2027." } }
+  ],
+  "caption": "Site signals. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. Meet Pulse. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Sixteen-second vertical video. Contour lines on lavender: Site signals, one consolidated view across your locations. Over panning brushed metal, four quick cuts: Site activity, Service requests, Escalations, Team updates. End card: Meet Pulse. Request a Pulse demo. Early-access pilots planned for Q1 2027. Original music."
+}

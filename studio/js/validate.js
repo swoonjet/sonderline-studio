@@ -4,7 +4,7 @@
 
 import { sampleLuminance, worstContrast, hexToRgb } from './color.js';
 
-const norm = s => s.replace(/\s+/g, ' ').trim();
+const norm = s => String(s ?? '').replace(/\s+/g, ' ').trim();
 
 export function approvedSet(copy) {
   const p = copy.product;
@@ -53,6 +53,13 @@ export function validateFrame(result, canvas, brand) {
   const approved = approvedSet(brand.copy);
   const checks = [];
   const add = (id, title, page, status, detail, boxes = [], gate) => checks.push({ id, title, page, status, detail, boxes, gate });
+
+  // 0. Required content present (a layout with an empty slot can't ship)
+  {
+    const missing = G.filter(g => g.kind === 'missing');
+    if (missing.length) add('content', 'Required content is filled in', null, 'fail',
+      missing.map(g => g.slot === 'photo' ? `Photo "${g.detail}" isn't in the library` : `The ${g.slot.replace('_', ' ')} is empty`).join(' · '), missing);
+  }
 
   // 1. On-image copy
   {

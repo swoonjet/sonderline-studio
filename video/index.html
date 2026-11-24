@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pulse Video Studio</title>
+<link rel="stylesheet" href="../studio/css/studio.css">
+<link rel="stylesheet" href="video.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="" class="sym"><strong>Pulse Video Studio</strong><span class="muted">Sonderline Social System · motion prototype</span></div>
+  <nav><a href="../">Overview</a><a href="../docs/">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio (stills)</a></nav>
+</header>
+
+<ol class="steps" aria-label="Workflow">
+  <li><b>1</b> Template</li><li><b>2</b> Scenes</li><li><b>3</b> Preview</li><li><b>4</b> Check</li><li><b>5</b> Approve &amp; export</li>
+</ol>
+
+<main class="grid">
+  <section class="col left">
+    <h2><b>1</b> Template</h2>
+    <label>Start from
+      <select id="preset">
+        <option value="../studio/specs/d5-launch-teaser.json">D5 · Launch teaser · 4:5 · 12s</option>
+        <option value="../studio/specs/d6-signals-reel.json">D6 · Site signals reel · 9:16 · 16s</option>
+        <option value="../studio/specs/d4-pulse-motion.json">D4 · Storyboard (guide p12) · 4:5</option>
+        <option value="blank">Blank: title card + end card</option>
+      </select>
+    </label>
+    <div class="row2">
+      <label>Format<select id="format"></select></label>
+      <label>Music<select id="music"></select></label>
+    </div>
+    <p id="musicNote" class="fine"></p>
+
+    <h2><b>2</b> Scenes <span class="muted" id="sceneMeta"></span></h2>
+    <div id="scenes"></div>
+    <div class="addrow">
+      <select id="addLayout"></select>
+      <button id="addScene">Add scene</button>
+    </div>
+    <label>Caption<textarea id="caption" rows="4"></textarea></label>
+    <label>Alt text / description<textarea id="alt" rows="3"></textarea></label>
+    <details>
+      <summary>Video spec JSON</summary>
+      <textarea id="json" rows="14" spellcheck="false"></textarea>
+      <button id="applyJson">Apply JSON</button>
+    </details>
+  </section>
+
+  <section class="col mid">
+    <h2><b>3</b> Preview <span class="muted" id="meta"></span></h2>
+    <div class="stage"><div class="stageInner"><canvas id="screen"></canvas></div></div>
+    <div class="transport">
+      <button id="play" class="primary" aria-label="Play">Play</button>
+      <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Scrub">
+      <span id="clock" class="clock">0.0s</span>
+      <label class="check"><input type="checkbox" id="sound" checked> Sound</label>
+    </div>
+    <div id="lanes" class="lanes" aria-hidden="true"></div>
+    <p class="fine">Type wipes on and then holds. The photography pans, Contour lines draw on, and scenes cut on the beat through a Contour wipe. The footer never moves.</p>
+  </section>
+
+  <section class="col right">
+    <h2><b>4</b> Check <span id="overall" class="chip"></span></h2>
+    <p class="fine">Each scene is checked like a still at the start, middle and end of its move.</p>
+    <div id="checks"></div>
+    <h3>Caption &amp; alt text</h3>
+    <ul id="copyChecks" class="checks"></ul>
+
+    <h2><b>5</b> Approve &amp; export</h2>
+    <div id="gates"></div>
+    <button id="record" class="primary" disabled>Record video with music</button>
+    <button id="saveSpec">Download spec</button>
+    <p id="exportStatus" class="fine"></p>
+    <p class="fine">Recording runs in real time in this browser (MP4 where supported, otherwise WebM). For frame-accurate MP4 masters: <code>tools/produce_video.py &lt;spec&gt;</code>.</p>
+  </section>
+</main>
+
+<footer class="foot fine">Prototype by Jon Toews for SketchDeck. Sonderline is fictional. Photography is the kit's own AI-generated imagery. Music is original, synthesised for this prototype. Contour is a proposed flow graphic derived from the S symbol. Inter Tight, SIL OFL 1.1.</footer>
+<script type="module" src="video-app.js"></script>
+</body>
+</html>

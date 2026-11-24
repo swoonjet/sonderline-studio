@@ -22,6 +22,7 @@ export function render(canvas, brand, frame, formatId) {
   if (!f) throw new Error(`Unknown format "${formatId}"`);
   canvas.width = f.w; canvas.height = f.h;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  frame = { ...frame, content: { ...(frame.content || {}) } };
   // a designer can override the crop per format (portrait and landscape rarely want the same crop)
   const ov = frame.photo && frame.photoOverrides?.[formatId];
   if (ov) frame = { ...frame, photo: { ...frame.photo, ...ov } };
@@ -37,8 +38,18 @@ export function render(canvas, brand, frame, formatId) {
     if (!crowded(R.geometry)) break;
   }
   if (R.relax) R.notes.push(`Copy needed more room: layout relaxed ${R.relax} step${R.relax > 1 ? 's' : ''}.`);
+  for (const slot of REQUIRED[frame.layout] || []) {
+    if (!String(frame.content[slot] ?? '').trim()) R.geometry.push({ kind: 'missing', slot, x: 0, y: 0, w: f.w, h: f.h });
+  }
   return R.finish();
 }
+
+// Slots a layout can't do without. Missing ones become a validator failure (with fixes), not a crash.
+export const REQUIRED = {
+  'photo-hero': ['headline'], 'type-led': ['headline'], 'signal': ['signal'], 'signal-grid': ['headline'],
+  'scene-context': ['headline'], 'scene-story': ['headline'], 'scene-invite': ['headline'],
+  'contour-title': ['headline'], 'contour-end': ['headline'],
+};
 
 const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 function crowded(G) {
@@ -77,11 +88,17 @@ class Renderer {
 
   photo(p, r) {
     const img = this.brand.photos[p.id];
-    if (!img) throw new Error(`Unknown photo "${p.id}"`);
-    const z = p.zoom || 1;
+    if (!img) {
+      this.field('coolgrey', r.x, r.y, r.w, r.h);
+      this.geometry.push({ kind: 'missing', slot: 'photo', detail: p.id, ...r });
+      return { kind: 'photo', id: p.id, ...r, upscale: 1, scrim: 0 };
+    }
+    // sane ranges: zoom 1-3x, focus inside the photo
+    const z = Math.min(3, Math.max(1, Number(p.zoom) || 1));
     const s = Math.max(r.w / img.width, r.h / img.height) * z;
     const dw = img.width * s, dh = img.height * s;
-    const [fx, fy] = p.focus || [0.5, 0.5];
+    const clamp01 = v => Math.min(1, Math.max(0, Number.isFinite(+v) ? +v : 0.5));
+    const fx = clamp01(p.focus?.[0]), fy = clamp01(p.focus?.[1]);
     const dx = Math.min(r.x, Math.max(r.x + r.w - dw, r.x + r.w / 2 - fx * dw));
     const dy = Math.min(r.y, Math.max(r.y + r.h - dh, r.y + r.h / 2 - fy * dh));
     const ctx = this.ctx;
@@ -117,8 +134,11 @@ class Renderer {
       o.fillStyle = hz; o.fillRect(0, 0, r.w, end - r.y);
       ctx.drawImage(off, r.x, r.y);
     };
+    // read only the pixels under the headline: the solve runs up to 19 times per render
+    const bx = Math.max(0, Math.floor(textBox.x)), by = Math.max(0, Math.floor(textBox.y));
+    const bw = Math.max(1, Math.min(this.W - bx, Math.ceil(textBox.w))), bh = Math.max(1, Math.min(this.H - by, Math.ceil(textBox.h)));
     const measure = () => worstContrast(
-      sampleLuminance(this.ctx.getImageData(0, 0, this.W, this.H), textBox, 4), this.c.white);
+      sampleLuminance(this.ctx.getImageData(bx, by, bw, bh), { x: 0, y: 0, w: bw, h: bh }, 4), this.c.white);
     let a = 0;
     if (mode === 'off') a = 0;
     else if (typeof mode === 'number') a = mode;
@@ -154,7 +174,11 @@ class Renderer {
       for (let i = n; i >= 0; i--) { const x = x0 + (x1 - sl - x0) * i / n; ctx.lineTo(x, yAt(x) + t); }
       ctx.closePath(); ctx.fill();
     };
-    ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+    // motion: bands draw on from the left and the step travels (video only)
+    const anim = this.frame.flowAnim;
+    const drawW = anim ? r.w * Math.min(1, Math.max(0, anim.progress)) : r.w;
+    const shift = anim ? (anim.phase - 0.5) * 0.22 * r.w : 0;
+    ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, drawW, r.h); ctx.clip();
 
     if (style === 'bars') {                       // v0 stand-in, kept for comparison
       const rows = Math.max(3, Math.round(r.h / (0.05 * this.u))), t = r.h / (rows * 1.9), sl = t * slantK;
@@ -200,7 +224,7 @@ class Renderer {
     } else if (style === 'contour') {
       const n = Math.max(10, Math.round(r.h / (0.022 * this.u)));
       const t = r.h / (n * 2.1), pitch = r.h / n, dy = -2.2 * pitch;
-      const xs = r.x + r.w * (0.45 + rnd() * 0.1), w = 0.22 * r.w;
+      const xs = r.x + r.w * (0.45 + rnd() * 0.1) + shift, w = 0.22 * r.w;
       const sigRow = Math.floor(n * 0.6);
       for (let i = 0; i < n + 3; i++) {
         const base = r.y + (i + 0.3) * pitch - dy * 0;
@@ -214,16 +238,18 @@ class Renderer {
   // ---------- text ----------
   fit(text, o) {
     const ctx = this.ctx;
+    text = String(text ?? '').replace(/\s+/g, ' ').trim();
+    if (!text) return { size: Math.round(o.size), lines: [], width: 0, overflow: false };
     for (let size = Math.round(o.size); ; size = Math.floor(size * 0.96)) {
       this.font(size, o.weight || 400, o.ls || 0);
       let lines = this.wrap(text, o.maxW, o.breaks);
       if (o.breaks && lines.length > o.maxLines) lines = this.wrap(text, o.maxW, false);
-      const width = Math.max(...lines.map(l => ctx.measureText(l).width));
+      const width = Math.max(0, ...lines.map(l => ctx.measureText(l).width));
       const height = size * CAP + (lines.length - 1) * size * (o.lh ?? 1.12) + DESC * size;
       const ok = lines.length <= o.maxLines && width <= o.maxW + 0.5 && height <= (o.maxH ?? 1e9);
       if (ok || size <= o.min) {
         if (ok && !o.breaks && lines.length > 1) lines = this.balance(text, lines.length, width);
-        return { size, lines, width: Math.max(...lines.map(l => ctx.measureText(l).width)), overflow: !ok };
+        return { size, lines, width: Math.max(0, ...lines.map(l => ctx.measureText(l).width)), overflow: !ok };
       }
     }
   }
@@ -262,12 +288,16 @@ class Renderer {
   // Text is queued and drawn after the background snapshot used by the validator.
   text(t) {
     const lh = t.lh ?? 1.12;
+    if (!t.lines && !String(t.text ?? '').trim()) {
+      return { x: t.x, y: t.y, w: 0, h: 0, size: t.size, bottom: t.y, baseline: t.y, lastBase: t.y, lines: [] };
+    }
+    if (t.lines && !t.lines.length) return { x: t.x, y: t.y, w: 0, h: 0, size: t.size, bottom: t.y, baseline: t.y, lastBase: t.y, lines: [] };
     const fit = t.lines ? { size: t.size, lines: t.lines, overflow: !!t.overflow } : this.fit(t.text, {
       size: t.size, min: t.min ?? t.size, maxW: t.maxW ?? 1e9, maxLines: t.maxLines ?? 1,
       weight: t.weight, ls: t.ls, breaks: t.breaks, lh: t.lh, maxH: t.maxH,
     });
     this.font(fit.size, t.weight || 400, t.ls || 0);
-    const width = Math.max(...fit.lines.map(l => this.ctx.measureText(l).width));
+    const width = Math.max(0, ...fit.lines.map(l => this.ctx.measureText(l).width));
     const capTop = t.y, cap = fit.size * CAP;
     const lastBase = capTop + cap + (fit.lines.length - 1) * fit.size * lh;
     const x0 = t.align === 'right' ? t.x - width : t.x;
@@ -281,7 +311,7 @@ class Renderer {
       this.ctx.textAlign = 'left';
     });
     this.geometry.push({
-      kind: 'text', role: t.role, text: t.text, system: !!t.system, lines: fit.lines,
+      kind: 'text', role: t.role, text: String(t.text ?? fit.lines.join(' ')), system: !!t.system, lines: fit.lines,
       size: fit.size, weight: t.weight || 400, color, on: t.on, overflow: fit.overflow,
       maxLines: t.maxLines ?? 1, ...box, baseline: capTop + cap,
     });
@@ -612,6 +642,33 @@ const LAYOUTS = {
     R.footer(yF);
   },
 
+  // Video title card (concept D): statement on a field, Contour full-bleed below it, optional lead.
+  'contour-title'(R) {
+    const { W, u, m, frame } = R;
+    const yF = R.yF, c = frame.content;
+    const fieldKey = frame.field || 'black';
+    const ink = fieldKey === 'black' ? 'white' : 'black';
+    R.field(fieldKey, 0, 0, W, yF);
+    const lab = Math.round(0.0167 * u);
+    if (c.label) R.text({ role: 'label', text: c.label, x: m, y: R.top, size: lab, color: ink, on: fieldKey });
+    let bottom = yF - m;
+    if (c.lead) {
+      const lf = R.fit(c.lead, { size: 0.046 * u, min: 0.024 * u, maxW: W * (R.landscape ? 0.5 : 0.8), maxLines: 3 + R.relax, lh: 1.1, ls: -0.005, maxH: 0.3 * yF });
+      const lt = bottom - blockH(lf, 1.1) + DESC * lf.size;
+      R.text({ role: 'lead', text: c.lead, x: m, y: lt, size: lf.size, lines: lf.lines, overflow: lf.overflow, lh: 1.1, ls: -0.005, color: ink, on: fieldKey, maxLines: 3 + R.relax });
+      bottom = lt - 0.06 * u;
+    }
+    const hTop = (c.label ? R.top + lab * CAP + 0.05 * u : R.top);
+    const hl = R.text({
+      role: 'headline', text: c.headline, x: m, y: hTop, size: 0.15 * u, min: (0.05 - 0.005 * R.relax) * u,
+      maxW: W * (R.landscape ? 0.62 : 1) - 2 * m, maxLines: 3 + R.relax, maxH: (bottom - hTop) * 0.55,
+      ls: -0.02, lh: 0.97, breaks: true, color: ink, on: fieldKey,
+    });
+    const fy = hl.bottom + 0.07 * u, fh = bottom - fy;
+    if (frame.flow !== false && fh > 0.08 * u) R.flow({ x: 0, y: fy, w: W, h: fh }, fieldKey === 'black' ? 'black' : fieldKey, frame.flowSeed || 9, frame.flowStyle || 'contour');
+    R.footer(yF);
+  },
+
   // Scene 03 / Invitation: big statement, CTA, pilot status, all on lavender.
   'scene-invite'(R) {
     const { W, u, m, frame } = R;
@@ -645,14 +702,23 @@ export const LAYOUT_NAMES = Object.keys(LAYOUTS);
 
 // Layouts a team would normally pick for each format (used by the Studio's suggestions).
 export const LAYOUT_FOR_FORMAT = {
-  feed: ['photo-hero', 'type-led', 'signal', 'signal-grid', 'scene-context', 'scene-story', 'scene-invite'],
+  feed: ['photo-hero', 'type-led', 'signal', 'signal-grid', 'scene-context', 'scene-story', 'scene-invite', 'contour-title'],
   square: ['photo-hero', 'type-led', 'signal', 'scene-invite'],
   link: ['photo-hero', 'type-led', 'signal'],
-  story: ['photo-hero', 'type-led', 'signal', 'scene-context', 'scene-story', 'scene-invite'],
+  story: ['photo-hero', 'type-led', 'signal', 'scene-context', 'scene-story', 'scene-invite', 'contour-title'],
   slide: ['photo-hero', 'signal-grid', 'type-led', 'signal'],
 };
 
 // Review helper: one flow graphic on its colourway field, no type (used for option sheets).
+// Full-bleed Contour sheet, used as the wipe between video scenes.
+export function renderFlowSheet(canvas, brand, w, h, colourway = 'lavender', style = 'contour', seed = 3) {
+  canvas.width = w; canvas.height = h;
+  const R = new Renderer(canvas.getContext('2d'), brand, { w, h, u: w, footer: 0 }, { content: {} });
+  R.field(brand.tokens.flow.colourways[colourway].field, 0, 0, w, h);
+  R.flow({ x: 0, y: 0.12 * h, w, h: 0.76 * h }, colourway, seed, style);
+  return canvas;
+}
+
 export function renderFlowSwatch(canvas, brand, style, colourway, seed = 7, w = 900, h = 900) {
   canvas.width = w; canvas.height = h;
   const f = { w, h, u: w, footer: 0 };

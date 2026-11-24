@@ -32,6 +32,11 @@ function slotOf(o, g) {
   return ['headline', 'label', 'lead', 'cta', 'status', 'status_label', 'footer_label'].includes(g.role) ? g.role : null;
 }
 
+// Stills have frames; videos have scenes. Both resolve to a list of frame specs.
+const framesOf = spec => (spec.scenes
+  ? spec.scenes.map((sc, i) => ({ ...sc, content: { ...(spec.content || {}), ...(sc.content || {}) }, frameIndex: i }))
+  : frames(spec));
+
 export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
   const approved = approvedSet(brand.copy);
 
@@ -49,7 +54,7 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
     if (!base) return 'No photo to re-crop.';
     setBusy(`Searching crops for ${o.fmt}…`);
     let best = null;
-    const fr0 = frames(spec)[o.frameIndex];
+    const fr0 = framesOf(spec)[o.frameIndex];
     for (const zoom of [1, 1.3, 1.6, 2]) for (const fx of [0.05, 0.25, 0.5, 0.75, 0.95]) for (const fy of [0.1, 0.5, 0.9]) {
       const fr = { ...fr0, photo: { ...base, focus: [fx, fy], zoom }, photoOverrides: undefined, scrim: 'auto' };
       const c = document.createElement('canvas');
@@ -63,8 +68,15 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
     }
     setBusy('');
     if (!best) return 'No crop of this photo passes. Try the other photo or another layout.';
-    t.photoOverrides ||= {};
-    t.photoOverrides[o.fmt] = { focus: best.focus, zoom: best.zoom };
+    if (t.pan) {
+      // video: keep the move, centred on the crop that works
+      const [fx, fy] = best.focus;
+      t.photo = { ...base, zoom: best.zoom };
+      t.pan = [[Math.max(0, fx - 0.1), fy], [Math.min(1, fx + 0.1), fy]];
+    } else {
+      t.photoOverrides ||= {};
+      t.photoOverrides[o.fmt] = { focus: best.focus, zoom: best.zoom };
+    }
     if (t.scrim === 'off') t.scrim = 'auto';
     commit(true);
     return `Re-cropped ${o.fmt}: scrim ${Math.round(best.scrim * 100)}%. A designer should confirm the crop.`;
@@ -81,6 +93,21 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
     const fixes = [];
     const t = targetFor(o.frameIndex);
     const texts = (check.boxes || []).filter(b => b.kind === 'text');
+    if (check.id === 'content') {
+      for (const g of check.boxes || []) {
+        if (g.slot === 'photo') {
+          for (const id of Object.keys(brand.tokens.photography)) fixes.push({ label: `Use the ${id} photo`, run: () => { t.photo = { id, focus: [0.3, 0.5], zoom: 1 }; commit(true); } });
+          continue;
+        }
+        const have = targetFor(o.frameIndex).content || {};
+        const pool = candidates(brand, g.slot);
+        // prefer the frame's own signal for carousel frames, else the closest to what's already there
+        const seed = [have.headline, have.lead, have.signal].filter(Boolean).join(' ');
+        const ranked = seed ? pool.map(c => ({ c, s: similarity(seed, c) })).sort((a, b) => b.s - a.s).map(x => x.c) : pool;
+        for (const c of ranked.slice(0, 3)) fixes.push({ label: `"${c}"`, hint: `Fill ${g.slot} with`, run: setText(o, g.slot, c) });
+      }
+    }
+    if (check.id === 'render') fixes.push(...layoutSwaps(o));
     if (check.id === 'contrast') {
       const onPhoto = texts.some(b => b.on === 'photo');
       if (onPhoto) {
@@ -118,6 +145,12 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
         commit(true);
       } });
     }
+    if (check.id === 'palette' || check.id === 'pairing') {
+      fixes.push({ label: 'Reset panel colours to the brand defaults', run: () => {
+        for (const k of ['accent', 'field']) if (k in t) t[k] = k === 'accent' ? 'lavender' : (t.layout === 'signal' ? 'white' : 'lavender');
+        commit(true);
+      } });
+    }
     if (check.id === 'vermilion' || check.id === 'assumed') {
       if (t.flow ?? getSpec().flow) fixes.push({ label: 'Remove the flow graphic', run: () => { t.flow = false; commit(true); } });
     }
@@ -138,7 +171,7 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
 
   function composeCaption() {
     const spec = getSpec(), p = brand.copy.product;
-    const heads = frames(spec).map(f => f.content?.headline).filter(h => h && checkCopy(h, brand.copy, approved).status === 'pass');
+    const heads = framesOf(spec).map(f => f.content?.headline).filter(h => h && checkCopy(h, brand.copy, approved).status === 'pass');
     return [heads[0], p.description, p.audience, p.status, p.cta].filter(Boolean).join(' ');
   }
 
@@ -148,7 +181,7 @@ export function makeFixer({ brand, getSpec, targetFor, commit, setBusy }) {
       'motion-study': 'Black-and-white photograph of a person in a dark coat moving through a glass concourse, blurred with motion.',
       'material-study': 'Close-up of ribbed brushed metal with a dark curved shadow.',
     };
-    const fr = frames(spec);
+    const fr = framesOf(spec);
     const ph = fr.map(f => f.photo?.id).find(Boolean);
     const lines = [...new Set(fr.flatMap(f => ['headline', 'signal', 'lead', 'cta', 'status'].map(k => f.content?.[k]).filter(Boolean)))];
     const alt = [fr.length > 1 ? `${fr.length}-frame sequence.` : '', ph ? photos[ph] : '', lines.join(' '), 'Sonderline logo.'].filter(Boolean).join(' ');

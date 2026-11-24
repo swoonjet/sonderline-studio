@@ -2,50 +2,30 @@
 <html lang="en"><head><meta charset="utf-8"><title>video render</title><meta name="robots" content="noindex"></head>
 <body style="margin:0">
 <script type="module">
-  // Headless video target for tools/produce_video.py. Each scene is a frame spec; the photo
-  // pans between two focus points while type holds still (guide p12). Scenes cut cleanly (cross-fades ghost the type).
-  // Every scene's held frame is validated like a still.
+  // Headless target for tools/produce_video.py: the same motion engine the Video Studio previews.
   import { loadBrand } from './js/brand.js';
-  import { frames, render } from './js/engine.js';
-  import { validateFrame, validateSpecCopy } from './js/validate.js';
+  import { MotionRenderer } from './js/motion.js';
   const q = new URLSearchParams(location.search);
-  const brand = await loadBrand('..');
-  const spec = await fetch(q.get('spec')).then(r => r.json());
-  const fmt = spec.formats[0], fps = spec.fps || 30, fade = Math.round((spec.crossfade ?? 0) * fps);   // default: clean cuts, so type never ghosts
-  const scenes = frames(spec).map(s => ({ ...s, n: Math.round(s.dur * fps) }));
-  const total = scenes.reduce((a, s) => a + s.n, 0);
-  const ease = t => t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
-  const at = (s, t) => {
-    if (!s.pan || !s.photo) return s;
-    const [a, b] = s.pan, e = ease(t);
-    return { ...s, photo: { ...s.photo, focus: [a[0] + (b[0] - a[0]) * e, a[1] + (b[1] - a[1]) * e] } };
-  };
-  const A = document.createElement('canvas'), B = document.createElement('canvas'), OUT = document.createElement('canvas');
-  window.__video = {
-    total, fps,
-    frame(i) {
-      let k = 0, j = i;
-      while (j >= scenes[k].n) { j -= scenes[k].n; k++; }
-      const s = scenes[k];
-      render(A, brand, at(s, j / (s.n - 1)), fmt);
-      OUT.width = A.width; OUT.height = A.height;
-      const ctx = OUT.getContext('2d');
-      ctx.globalAlpha = 1; ctx.drawImage(A, 0, 0);
-      if (k > 0 && j < fade) {
-        render(B, brand, at(scenes[k - 1], 1), fmt);
-        ctx.globalAlpha = 1 - (j + 1) / (fade + 1);
-        ctx.drawImage(B, 0, 0);
-      }
-      return OUT.toDataURL('image/jpeg', 0.95);
-    },
-    held() {
-      return scenes.map((s, k) => {
-        const c = document.createElement('canvas');
-        const res = render(c, brand, at(s, 0.5), fmt);
-        return { name: `scene-${String(k + 1).padStart(2, '0')}`, png: c.toDataURL('image/png'), report: validateFrame(res, c, brand) };
-      });
-    },
-    copy: validateSpecCopy(spec, brand),
-    spec,
-  };
+  try {
+    const brand = await loadBrand('..');
+    const tracks = await fetch('../assets/music/tracks.json').then(r => r.json());
+    const spec = await fetch(q.get('spec')).then(r => r.json());
+    const fps = spec.fps || 30;
+    const mr = new MotionRenderer(brand, spec, tracks).prepare();
+    const out = document.createElement('canvas');
+    const checks = mr.check();
+    window.__video = {
+      spec, fps, total: Math.round(mr.tl.total * fps), seconds: mr.tl.total, bpm: mr.tl.bpm,
+      music: spec.music && tracks[spec.music] ? tracks[spec.music].file : null,
+      frame(i) { mr.frameAt(i / fps, out); return out.toDataURL('image/jpeg', 0.94); },
+      held() {
+        return mr.tl.scenes.map((sc, k) => {
+          const c = document.createElement('canvas');
+          mr.heldFrame(sc, c);
+          return { name: `scene-${String(k + 1).padStart(2, '0')}`, png: c.toDataURL('image/png'), report: checks.scenes[k] };
+        });
+      },
+      copy: checks.copy,
+    };
+  } catch (e) { window.__video = { error: String(e.stack || e) }; }
 </script></body></html>

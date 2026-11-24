@@ -1,0 +1,8 @@
+<!doctype html><html><body><script type="module">
+  import { loadBrand } from '../js/brand.js';
+  import { render } from '../js/engine.js';
+  import { validateFrame } from '../js/validate.js';
+  window.brand = await loadBrand('../..');
+  window.probe = (spec, fmt) => { const c = document.createElement('canvas'); const t = performance.now(); const r = render(c, brand, spec, fmt); validateFrame(r, c, brand); return Math.round(performance.now() - t); };
+  window.__ready = true;
+</script></body></html>

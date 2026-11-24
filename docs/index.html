@@ -10,7 +10,7 @@
 <body>
 <header class="bar">
   <a class="brand" href="../"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="">Sonderline Social System</a>
-  <nav><a href="../">Overview</a><a href="./" aria-current="page">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Open the Studio</a></nav>
+  <nav><a href="../">Overview</a><a href="./" aria-current="page">System</a><a href="../deliverables/">Deliverables</a><a href="../studio/">Social Studio</a><a href="../video/">Video Studio</a></nav>
 </header>
 
 <div class="hero">
@@ -113,6 +113,9 @@
     <tr><td><b>One-click fixes</b> in the Studio for every failing check</td><td><span class="status works">Works</span></td><td>Re-crop search, auto scrim, closest or shorter approved line, layout swap, caption and alt rebuild. Fixes only change the spec, so the rules still apply</td></tr>
     <tr><td><b>Pulse Social Studio</b> (web app)</td><td><span class="status works">Works</span></td><td>Brief → spec → renders → checks → named approvals → zip export</td></tr>
     <tr><td><b>Claude drafting</b> (brief → spec)</td><td><span class="status works">Works</span></td><td>Needs an Anthropic API key, pasted into the Studio; without one, the offline rules drafter runs</td></tr>
+    <tr><td><b>Pulse Video Studio</b> (web app): video posts from the same rules</td><td><span class="status works">Works</span></td><td>Scenes in beats, live preview with music, per-scene checks at the start, middle and end of each move, approvals, and in-browser MP4 recording</td></tr>
+    <tr><td><b>Motion engine</b>: pans, type wipe-on and hold, Contour draw-on and wipes, beat-synced cuts</td><td><span class="status works">Works</span></td><td>Built on the still layouts, so every frame obeys the same rules. MP4 masters via <code>tools/produce_video.py</code></td></tr>
+    <tr><td><b>Music</b>: three original beds (Pulse, Contour, Signal)</td><td><span class="status works">Works</span></td><td>Synthesised for the prototype, so there are no licences. For production, use a licensed library or a commissioned sonic brand</td></tr>
     <tr><td><b>Batch CLI</b> (<code>tools/produce.py</code>, <code>tools/produce_video.py</code>)</td><td><span class="status works">Works</span></td><td>Produced every deliverable on these pages, with reports</td></tr>
     <tr><td><b>Intake webhooks, DAM, scheduler, SSO</b></td><td><span class="status concept">Concept</span></td><td>Standard integrations; depends on Sonderline's existing stack</td></tr>
     <tr><td><b>Server-side drafting + audit log</b></td><td><span class="status concept">Concept</span></td><td>Needed before production: keys must not live in browsers</td></tr>
@@ -159,7 +162,7 @@
       <h3>Assumptions</h3>
       <ul>
         <li>Brand Guide 8.0 is the source of truth. Where the kit's notes differ (e.g. a mockup note describing a full vermilion panel), the guide wins.</li>
-        <li><b>Flow graphics were listed in the brief but not supplied.</b> I explored four options derived from the S symbol's stroke (<a href="#flow">below</a>), and we chose <b>Contour</b>. Until Sonderline confirms or supplies its own, the checker routes any output that uses it to the brand lead.</li>
+        <li><b>Flow graphics were listed in the brief but not supplied.</b> I designed a flow graphic, <b>Contour</b>, derived from the S symbol's stroke: fine bands stepping together, with one vermilion signal line. It appears on carousel covers and closers, on video title cards and end cards, and as the wipe between video scenes. Until Sonderline confirms or supplies its own, the checker routes any output that uses it to the brand lead.</li>
         <li>Approved copy = guide page 13 plus the lines used in the guide's own examples.</li>
         <li>Format sizes and story safe zones (top 250px, bottom 340px) follow current platform guidance.</li>
         <li>Volumes and hours are illustrative until baselined.</li>
@@ -176,13 +179,6 @@
       </ul>
     </div>
   </div>
-</section>
-
-<section class="block" id="flow">
-  <p class="label">Appendix · flow graphic options</p>
-  <h2>Built from the symbol, never the symbol itself</h2>
-  <p class="prose">The brief lists flow graphics in four colourways, but none were in the kit. I took the S symbol's stroke (a horizontal band that steps through a smooth S-curve, with slanted ends) and explored four directions: A Lanes, B Converge, C Supergraphic and D Contour. <b>D · Contour</b> was chosen: fine bands stepping together, echoing the ribbed-metal photography, with one vermilion signal line (about 1% of the frame). All four pass the checks in context. The flow style is a single brand token, so swapping in Sonderline's own graphics later is a one-line change.</p>
-  <img src="flow-options.png" alt="Four flow graphic options in four colourways, shown on the carousel cover and closing frame" loading="lazy" style="margin-top:18px;outline:1px solid var(--line)">
 </section>
 
 <footer class="foot">Prepared by Jon Toews for SketchDeck's Director of AI Solutions exercise · November 2026 · Sonderline is a fictional brand.</footer>

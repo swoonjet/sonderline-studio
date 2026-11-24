@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>fuzz</title><meta name="robots" content="noindex"></head>
+<body><script type="module">
+  // Robustness test: every layout x format x hostile content. Pass = no exceptions, and every
+  // failing check offers at least one fix.
+  import { loadBrand } from '../js/brand.js';
+  import { render, LAYOUT_NAMES } from '../js/engine.js';
+  import { validateFrame } from '../js/validate.js';
+  import { makeFixer } from '../js/fixes.js';
+  const brand = await loadBrand('../..');
+  const P = brand.copy.product;
+  const contents = {
+    empty: {}, headlineOnly: { headline: 'Meet Pulse.' }, signalOnly: { signal: 'Escalations' },
+    whitespace: { headline: '   ', lead: ' ', label: '', cta: '  ', status: '', signal: ' ' },
+    nulls: { headline: null, lead: null, signal: null, status: null },
+    numbers: { headline: 123, lead: 4.5, signal: 7 },
+    short: { headline: 'Meet Pulse.', label: 'SONDERLINE PULSE', lead: 'A clearer view.', cta: P.cta, status_label: 'EARLY ACCESS', status: 'Pilots planned for Q1 2027.', signal: 'Escalations' },
+    long: { headline: 'One consolidated view of operations across multiple locations.', label: 'SONDERLINE PULSE / PRODUCT PERSPECTIVE', lead: P.description, cta: P.cta, status_label: 'PILOT STATUS', status: P.status, signal: 'Service requests' },
+    unbreakable: { headline: 'Operationsperspectiveconsolidatedviewacrosseverylocation', lead: 'Supercalifragilisticoperationalconsolidation', signal: 'Siteactivityservicerequestsescalations' },
+    forbidden: { headline: 'Cut costs 40% today.', lead: 'Customers love Pulse. Available now.', signal: '10x faster escalations' },
+  };
+  const photos = { none: null, valid: { id: 'motion-study', focus: [0.3, 0.5], zoom: 1 }, unknown: { id: 'stock-photo-99' }, absurd: { id: 'material-study', focus: [1.5, -1], zoom: 9 } };
+  const extras = [{ flow: true, accent: 'coolgrey', field: 'coolgrey' }, { accent: '#123456', field: 'hotpink', scrim: 'off' }];
+  window.__layouts = LAYOUT_NAMES;
+  window.__fuzzOne = (layout, onlyFmt) => {
+  const results = { renders: 0, exceptions: [], unfixable: [], fails: 0, byCheck: {} };
+  for (const fmt of (onlyFmt ? [onlyFmt] : Object.keys(brand.formats))) for (const [cn, content] of Object.entries(contents))
+  for (const [pn, photo] of Object.entries(photos)) for (const ex of extras) {
+    const spec = { layout, content: { ...content, footer_label: 'OPERATIONS / PERSPECTIVE' }, photo, index: '01 / 04', ...ex };
+    const tag = `${layout}/${fmt}/${cn}/${pn}/${JSON.stringify(ex)}`;
+    const t0 = performance.now();
+    try {
+      const c = document.createElement('canvas');
+      const res = render(c, brand, { ...spec, frameIndex: 0 }, fmt);
+      const rep = validateFrame(res, c, brand);
+      results.renders++;
+      const fixer = makeFixer({ brand, getSpec: () => spec, targetFor: () => spec, commit: () => {}, setBusy: () => {} });
+      const o = { fmt, layout, frameIndex: 0 };
+      for (const ch of rep.checks.filter(x => x.status === 'fail')) {
+        results.fails++; results.byCheck[ch.id] = (results.byCheck[ch.id] || 0) + 1;
+        if (!fixer.forCheck(ch, o).length) results.unfixable.push(`${tag} :: ${ch.id} :: ${ch.detail.slice(0, 80)}`);
+      }
+    } catch (e) { results.exceptions.push(`${tag} :: ${e.message}`); }
+    const ms = performance.now() - t0; if (ms > (results.slowMs || 0)) { results.slowMs = ms; results.slowest = tag; }
+  }
+  return results;
+  };
+  window.__ready = true;
+</script></body></html>

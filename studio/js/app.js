@@ -1,6 +1,6 @@
 // Pulse Social Studio: the team-facing front end of the Sonderline Social System.
 import { loadBrand } from './brand.js';
-import { frames, render } from './engine.js';
+import { frames, render, REQUIRED } from './engine.js';
 import { validateFrame, validateSpecCopy, checkCopy, approvedSet, sentences } from './validate.js';
 import { draftWithClaude, draftOffline } from './drafting.js';
 import { makeFixer, candidates } from './fixes.js';
@@ -74,6 +74,7 @@ const CONTENT_FIELDS = {
   'signal': [['label', 'Label', 'dl-label'], ['signal', 'Signal', 'dl-signal']],
   'signal-grid': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['lead', 'Lead', 'dl-lead'], ['cta', 'Call to action', 'dl-cta']],
   'scene-context': [['headline', 'Headline', 'dl-headline']],
+  'contour-title': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['lead', 'Lead', 'dl-lead']],
   'scene-story': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['status_label', 'Panel label', 'dl-label'], ['lead', 'Panel text', 'dl-lead']],
   'scene-invite': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['cta', 'Call to action', 'dl-cta'], ['status', 'Status', 'dl-status']],
 };
@@ -93,7 +94,7 @@ function buildForm() {
   form.replaceChildren();
 
   form.append(el('label', {}, 'Layout', el('select', {
-    onchange: e => { t.layout = e.target.value; changed(true); },
+    onchange: e => { t.layout = e.target.value; carryContent(t); changed(true); },
   }, Object.keys(CONTENT_FIELDS).map(k => el('option', { value: k, selected: k === layout }, k)))));
 
   t.content ||= {};
@@ -113,7 +114,7 @@ function buildForm() {
   const footVal = spec.content?.footer_label ?? '';
   form.append(el('label', {}, 'Footer label', el('input', { list: 'dl-label', value: footVal, oninput: e => { spec.content ||= {}; spec.content.footer_label = e.target.value; changed(); } })));
 
-  if (!['type-led', 'signal-grid', 'scene-invite'].includes(layout)) {
+  if (!['type-led', 'signal-grid', 'scene-invite', 'contour-title'].includes(layout)) {
     const ph = t.photo === undefined ? spec.photo : t.photo;
     form.append(el('label', {}, 'Photo', el('select', {
       onchange: e => { t.photo = e.target.value ? { id: e.target.value, focus: [0.5, 0.5], zoom: 1 } : null; changed(true); },
@@ -139,10 +140,10 @@ function buildForm() {
     const ac = t.accent ?? spec.accent ?? 'lavender';
     form.append(el('label', {}, 'Accent panel', el('select', { onchange: e => { t.accent = e.target.value; changed(); } },
       ['lavender', 'coolgrey'].map(v => el('option', { value: v, selected: ac === v }, v)))));
-  } else if (['type-led', 'signal'].includes(layout)) {
-    const fv = t.field ?? 'white';
+  } else if (['type-led', 'signal', 'contour-title'].includes(layout)) {
+    const fv = t.field ?? (layout === 'contour-title' ? 'black' : 'white');
     form.append(el('label', {}, 'Field colour', el('select', { onchange: e => { t.field = e.target.value; changed(); } },
-      ['white', 'lavender', 'coolgrey'].map(v => el('option', { value: v, selected: fv === v }, v)))));
+      (layout === 'contour-title' ? ['black', 'lavender', 'white', 'coolgrey'] : ['white', 'lavender', 'coolgrey']).map(v => el('option', { value: v, selected: fv === v }, v)))));
   }
 
   form.append(el('label', {}, 'Formats'), el('div', { class: 'fmt' }, FORMAT_KEYS.map(k => el('label', {},
@@ -156,6 +157,19 @@ function buildForm() {
     el('label', {}, 'Caption', el('textarea', { rows: 5, oninput: e => { spec.caption = e.target.value; changed(); } }, spec.caption || '')),
     el('label', {}, 'Alt text', el('textarea', { rows: 3, oninput: e => { spec.alt = e.target.value; changed(); } }, spec.alt || '')),
   );
+}
+
+// When the layout changes, fill any required slot the new layout needs from what the frame
+// already says (or the nearest approved line), so a switch never leaves an empty frame.
+function carryContent(t) {
+  t.content ||= {};
+  const c = t.content, signals = brand.copy.product.signals;
+  for (const slot of REQUIRED[t.layout] || []) {
+    if (String(c[slot] ?? '').trim()) continue;
+    if (slot === 'signal') c.signal = signals.includes(c.headline) ? c.headline : signals[Math.max(0, (spec.frames ? frameSel - 1 : 0)) % signals.length];
+    else if (slot === 'headline') c.headline = c.signal && candidates(brand, 'headline').length ? (candidates(brand, 'headline').find(h => h.includes('signal')) || candidates(brand, 'headline')[0]) : candidates(brand, 'headline')[0];
+    else c[slot] = candidates(brand, slot)[0];
+  }
 }
 
 let timer;
@@ -177,7 +191,7 @@ function rerender() {
         const result = render(canvas, brand, fr, fmt);
         outputs.push({ name: spec.frames ? `${fmt}-${String(fr.frameIndex + 1).padStart(2, '0')}` : fmt, fmt, layout: fr.layout, frameIndex: fr.frameIndex, canvas, result, report: validateFrame(result, canvas, brand) });
       } catch (e) {
-        outputs.push({ name: fmt, fmt, frameIndex: fr.frameIndex, canvas, error: e.message, report: { status: 'fail', checks: [{ id: 'render', title: 'Render', status: 'fail', detail: e.message, boxes: [] }] } });
+        outputs.push({ name: spec.frames ? `${fmt}-${String(fr.frameIndex + 1).padStart(2, '0')}` : fmt, fmt, layout: fr.layout, frameIndex: fr.frameIndex, canvas, error: e.message, report: { status: 'fail', checks: [{ id: 'render', title: 'Render', status: 'fail', detail: e.message, boxes: [] }] } });
       }
     }
   }

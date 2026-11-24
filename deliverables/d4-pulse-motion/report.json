@@ -1,5 +1,7 @@
 {
   "spec": "d4-pulse-motion",
+  "seconds": 11.25,
+  "bpm": 96,
   "copy": {
     "status": "pass",
     "checks": [
@@ -48,12 +50,14 @@
         "title": "Alt text present and factual",
         "page": 6,
         "status": "pass",
-        "detail": "306 characters."
+        "detail": "325 characters."
       }
     ]
   },
   "scenes": {
     "scene-01": {
+      "index": 0,
+      "layout": "scene-context",
       "status": "pass",
       "checks": [
         {
@@ -176,6 +180,8 @@
       ]
     },
     "scene-02": {
+      "index": 1,
+      "layout": "scene-story",
       "status": "pass",
       "checks": [
         {
@@ -298,6 +304,8 @@
       ]
     },
     "scene-03": {
+      "index": 2,
+      "layout": "scene-invite",
       "status": "pass",
       "checks": [
         {
