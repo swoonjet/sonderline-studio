@@ -101,11 +101,18 @@ export class MotionRenderer {
 
   // Footage for scene sc at tau must be on screen before rendering.
   async seek(sc, tau) {
-    const el = this.media.video?.(this.videoOwner(sc));
-    if (!el || !sc.clip) return;
+    if (!sc.clip) return;
     this.brand.footage ||= {};
-    this.brand.footage[`s${this.videoOwner(sc)}`] = el;
+    const el = this.media.frames ? null : this.media.video?.(this.videoOwner(sc));
+    if (!el && !this.media.frames) return;
+    if (el) this.brand.footage[`s${this.videoOwner(sc)}`] = el;
     const t = this.clipTime(sc, tau);
+    // offline masters: draw the exact frame from an extracted image sequence (headless browsers
+    // don't update a <video>'s drawable frame on seek, which froze the footage)
+    if (this.media.frames) {
+      this.brand.footage[`s${this.videoOwner(sc)}`] = await this.media.frames(sc.clip.name, t);
+      return;
+    }
     if (this.media.live) { if (Math.abs(el.currentTime - t) > 0.12) el.currentTime = t; if (el.paused) el.play().catch(() => {}); return; }
     if (Math.abs(el.currentTime - t) < 1 / (this.fps * 4) && el.readyState >= 2) return;
     await new Promise(res => { el.addEventListener('seeked', res, { once: true }); el.currentTime = t; });

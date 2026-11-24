@@ -745,7 +745,7 @@
           "title": "Text contrast \u2265 4.5:1 (measured)",
           "page": 6,
           "status": "pass",
-          "detail": "Lowest 6.80:1 across 7 elements.",
+          "detail": "Lowest 10.05:1 across 7 elements.",
           "boxes": [],
           "gate": null
         },

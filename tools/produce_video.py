@@ -17,6 +17,20 @@ from playwright.sync_api import sync_playwright
 from produce import ROOT, serve
 
 
+def ensure_frames():
+    """Extract every clip to a 24 fps JPEG sequence (from the near-lossless copy when it exists).
+    Headless Chromium doesn't refresh a <video>'s frame on seek, so masters draw these instead."""
+    for clip in json.loads((ROOT / "assets/video/clips.json").read_text()):
+        out = ROOT / "assets/video/frames" / clip
+        if out.exists() and any(out.glob("*.jpg")):
+            continue
+        out.mkdir(parents=True, exist_ok=True)
+        src = ROOT / "assets/video/hq" / f"{clip}.webm"
+        if not src.exists():
+            src = ROOT / "assets/video" / f"{clip}.webm"
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(src), "-vf", "fps=24", "-q:v", "2", str(out / "%04d.jpg")], check=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("specs", nargs="+")
@@ -28,7 +42,8 @@ def main():
         for spec_path in args.specs:
             rel = pathlib.Path(spec_path).resolve().relative_to(ROOT / "studio")
             page = browser.new_page()
-            hq = "&hq=1" if (ROOT / "assets/video/hq").exists() and any((ROOT / "assets/video/hq").glob("*.webm")) else ""
+            ensure_frames()
+            hq = "&frames=1"
             page.goto(f"http://127.0.0.1:{httpd.server_address[1]}/studio/video.html?spec={rel.as_posix()}{hq}")
             page.wait_for_function("window.__video", timeout=300_000)
             v = page.evaluate("({error: window.__video.error, total: window.__video.total, fps: window.__video.fps, seconds: window.__video.seconds, bpm: window.__video.bpm, music: window.__video.music, spec: window.__video.spec, copy: window.__video.copy})")
@@ -55,7 +70,7 @@ def main():
                     fade = max(0.0, v["seconds"] - 1.6)
                     cmd += ["-i", str(ROOT / v["music"]), "-af", f"afade=t=out:st={fade:.2f}:d=1.6", "-c:a", "aac", "-b:a", "192k", "-shortest"]
                 # high-quality delivery encode: low CRF, adaptive quantisation for flat colour fields, 2 s GOP
-                cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-profile:v", "high", "-crf", "14", "-preset", "slow",
+                cmd += ["-c:v", "libx264", "-pix_fmt", "yuv420p", "-profile:v", "high", "-crf", "17", "-preset", "slow",
                         "-x264-params", "aq-mode=3:aq-strength=0.9:deblock=-1,-1", "-g", "48", "-movflags", "+faststart",
                         "-t", f"{v['seconds']:.3f}", str(mp4)]
                 subprocess.run(cmd, check=True)

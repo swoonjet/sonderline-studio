@@ -11,10 +11,22 @@
     const tracks = await fetch('../assets/music/tracks.json').then(r => r.json());
     const spec = await fetch(q.get('spec')).then(r => r.json());
     const tl = timeline(spec, tracks);
+    // masters (?frames=1): footage comes from image sequences extracted by tools/produce_video.py
+    const useFrames = !!q.get('frames');
+    const cache = new Map();
+    const frameImage = (name, t) => {
+      const i = Math.max(1, Math.round(t * 24) + 1);
+      const key = `${name}/${i}`;
+      if (!cache.has(key)) {
+        if (cache.size > 96) cache.delete(cache.keys().next().value);
+        cache.set(key, new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error(`Missing frame ${key}`)); im.src = `../assets/video/frames/${name}/${String(i).padStart(4, '0')}.jpg`; }));
+      }
+      return cache.get(key);
+    };
     // one <video> per scene group (continuous scenes share their group's element)
     const els = {};
     for (const sc of tl.scenes) {
-      if (!sc.clip || sc.continuous) continue;
+      if (useFrames || !sc.clip || sc.continuous) continue;
       const v = document.createElement('video');
       v.muted = true; v.preload = 'auto'; v.playsInline = true;
       // masters render from near-lossless footage (assets/video/hq, made locally from the raw clips)
@@ -22,7 +34,7 @@
       await new Promise((res, rej) => { v.addEventListener('loadeddata', res, { once: true }); v.addEventListener('error', () => rej(new Error(`Could not load ${sc.clip.name}`)), { once: true }); });
       els[sc.index] = v;
     }
-    const mr = await new MotionRenderer(brand, spec, tracks, { video: i => els[i] || null }).prepare();
+    const mr = await new MotionRenderer(brand, spec, tracks, useFrames ? { frames: frameImage } : { video: i => els[i] || null }).prepare();
     const out = document.createElement('canvas');
     const checks = await mr.check();
     window.__video = {

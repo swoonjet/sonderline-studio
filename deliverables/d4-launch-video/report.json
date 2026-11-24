@@ -69,7 +69,7 @@
           "title": "Text contrast \u2265 4.5:1 (measured)",
           "page": 6,
           "status": "pass",
-          "detail": "Lowest 6.15:1 across 3 elements.",
+          "detail": "Lowest 7.68:1 across 3 elements.",
           "boxes": [],
           "gate": null
         },
@@ -709,7 +709,7 @@
           "title": "Text contrast \u2265 4.5:1 (measured)",
           "page": 6,
           "status": "pass",
-          "detail": "Lowest 5.95:1 across 7 elements.",
+          "detail": "Lowest 7.11:1 across 7 elements.",
           "boxes": [],
           "gate": null
         },
