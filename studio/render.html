@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>render</title><meta name="robots" content="noindex"></head>
+<body style="margin:0;background:#fff">
+<script type="module">
+  // Headless render target for tools/produce.py: renders every format/frame of a spec,
+  // validates each, and hands PNGs + reports back to the CLI.
+  import { loadBrand } from './js/brand.js';
+  import { frames, render } from './js/engine.js';
+  import { validateFrame, validateSpecCopy } from './js/validate.js';
+  const q = new URLSearchParams(location.search);
+  try {
+    const brand = await loadBrand('..');
+    const spec = await fetch(q.get('spec')).then(r => r.json());
+    const out = [];
+    for (const fr of frames(spec)) {
+      for (const fmt of spec.formats) {
+        const c = document.createElement('canvas');
+        const res = render(c, brand, fr, fmt);
+        const report = validateFrame(res, c, brand);
+        const name = spec.frames ? `${fmt}-${String(fr.frameIndex + 1).padStart(2, '0')}` : fmt;
+        out.push({ name, png: c.toDataURL('image/png'), report, notes: res.notes, geometry: res.geometry });
+      }
+    }
+    window.__result = { spec, frames: out, copy: validateSpecCopy(spec, brand) };
+  } catch (e) { window.__result = { error: String(e.stack || e) }; }
+</script></body></html>

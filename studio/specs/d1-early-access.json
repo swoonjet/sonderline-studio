@@ -1,0 +1,25 @@
+{
+  "id": "d1-early-access",
+  "title": "Pulse early access: launch post",
+  "request": {
+    "requester": "Product marketing",
+    "channel": "LinkedIn + Instagram, organic",
+    "brief": "Announce early-access pilots for Sonderline Pulse to operations leaders at multi-site organizations. Goal: demo requests. Needs feed, square, link-card and story versions this week."
+  },
+  "layout": "photo-hero",
+  "formats": ["feed", "square", "link", "story"],
+  "photo": { "id": "motion-study", "focus": [0.28, 0.5], "zoom": 1 },
+  "scrim": "auto",
+  "accent": "lavender",
+  "content": {
+    "headline": "Meet Pulse.",
+    "label": "SONDERLINE PULSE",
+    "lead": "A clearer view across every location.",
+    "cta": "Request a Pulse demo.",
+    "status_label": "EARLY ACCESS",
+    "status": "Pilots planned for Q1 2027.",
+    "footer_label": "OPERATIONS / PERSPECTIVE"
+  },
+  "caption": "Meet Pulse. Pulse gives operations leaders a consolidated view of site activity, service requests, escalations and team updates. It is for organizations managing multiple locations. Early-access pilots planned for Q1 2027. Request a Pulse demo.",
+  "alt": "Black-and-white photograph of a person in a dark coat moving through a glass concourse, blurred with motion. Headline: Meet Pulse. A clearer view across every location. Request a Pulse demo. Early access: pilots planned for Q1 2027. Sonderline logo."
+}

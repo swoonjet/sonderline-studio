@@ -1,0 +1,57 @@
+{
+  "_about": "Output formats. Ratios for the photo-hero family were measured from the guide's social example (feed) and adapted per format. u = type/spacing unit in px (all type sizes are fractions of u). Safe zones keep text clear of platform UI.",
+  "feed": {
+    "label": "LinkedIn / Instagram feed 4:5",
+    "w": 1080,
+    "h": 1350,
+    "u": 1080,
+    "photo": 0.586667,
+    "info": 0.28,
+    "headlineW": 0.72,
+    "headlineLines": 2
+  },
+  "square": {
+    "label": "Feed square 1:1",
+    "w": 1080,
+    "h": 1080,
+    "u": 1080,
+    "photo": 0.52,
+    "info": 0.31,
+    "headlineW": 0.72,
+    "headlineLines": 2
+  },
+  "link": {
+    "label": "Link / ad card 1.91:1",
+    "w": 1200,
+    "h": 628,
+    "u": 1000,
+    "photo": 0.555,
+    "info": 0.3,
+    "headlineW": 0.62,
+    "headlineLines": 2
+  },
+  "story": {
+    "label": "Story / Reel cover 9:16",
+    "w": 1080,
+    "h": 1920,
+    "u": 1080,
+    "photo": 0.55,
+    "info": 0.2,
+    "headlineW": 0.84,
+    "headlineLines": 3,
+    "safeTop": 250,
+    "safeBottom": 340,
+    "footerContent": 140,
+    "headlineScale": 0.165
+  },
+  "slide": {
+    "label": "Presentation 16:9",
+    "w": 1920,
+    "h": 1080,
+    "u": 1500,
+    "photo": 0.62,
+    "info": 0.24,
+    "headlineW": 0.6,
+    "headlineLines": 2
+  }
+}
