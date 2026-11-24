@@ -3,6 +3,7 @@ import { loadBrand } from './brand.js';
 import { frames, render } from './engine.js';
 import { validateFrame, validateSpecCopy, checkCopy, approvedSet, sentences } from './validate.js';
 import { draftWithClaude, draftOffline } from './drafting.js';
+import { makeFixer, candidates } from './fixes.js';
 
 const $ = s => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => {
@@ -18,7 +19,7 @@ const el = (tag, attrs = {}, ...kids) => {
 const ICON = { pass: '✓', review: '!', fail: '✕' };
 const FORMAT_KEYS = ['feed', 'square', 'link', 'story', 'slide'];
 
-let brand, spec, approved;
+let brand, spec, approved, fixer;
 let frameSel = 0, outputs = [], sel = 0, approvals = {}, approvedHash = null;
 
 // ---------- spec lifecycle ----------
@@ -61,23 +62,20 @@ async function draft() {
 
 // ---------- spec form ----------
 function buildDatalists() {
-  const p = brand.copy.product;
-  const lines = [...new Set([...brand.copy.lines.map(l => l.text), p.description, p.audience, p.status, p.cta, ...p.capabilities])];
-  document.body.append(
-    el('datalist', { id: 'dl-lines' }, lines.map(t => el('option', { value: t }))),
-    el('datalist', { id: 'dl-labels' }, brand.copy.labels.map(t => el('option', { value: t }))),
-    el('datalist', { id: 'dl-signals' }, p.signals.map(t => el('option', { value: t }))),
-  );
+  // suggestions per slot, so a headline field offers headlines and a status field offers status lines
+  for (const slot of ['headline', 'lead', 'cta', 'status', 'label', 'signal']) {
+    document.body.append(el('datalist', { id: `dl-${slot}` }, candidates(brand, slot).map(t => el('option', { value: t }))));
+  }
 }
 
 const CONTENT_FIELDS = {
-  'photo-hero': [['headline', 'Headline', 'dl-lines'], ['label', 'Label', 'dl-labels'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines'], ['status_label', 'Status label', 'dl-labels'], ['status', 'Status', 'dl-lines']],
-  'type-led': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines']],
-  'signal': [['label', 'Label', 'dl-labels'], ['signal', 'Signal', 'dl-signals']],
-  'signal-grid': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['lead', 'Lead', 'dl-lines'], ['cta', 'Call to action', 'dl-lines']],
-  'scene-context': [['headline', 'Headline', 'dl-lines']],
-  'scene-story': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['status_label', 'Panel label', 'dl-labels'], ['lead', 'Panel text', 'dl-lines']],
-  'scene-invite': [['label', 'Label', 'dl-labels'], ['headline', 'Headline', 'dl-lines'], ['cta', 'Call to action', 'dl-lines'], ['status', 'Status', 'dl-lines']],
+  'photo-hero': [['headline', 'Headline', 'dl-headline'], ['label', 'Label', 'dl-label'], ['lead', 'Lead', 'dl-lead'], ['cta', 'Call to action', 'dl-cta'], ['status_label', 'Status label', 'dl-label'], ['status', 'Status', 'dl-status']],
+  'type-led': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['lead', 'Lead', 'dl-lead'], ['cta', 'Call to action', 'dl-cta']],
+  'signal': [['label', 'Label', 'dl-label'], ['signal', 'Signal', 'dl-signal']],
+  'signal-grid': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['lead', 'Lead', 'dl-lead'], ['cta', 'Call to action', 'dl-cta']],
+  'scene-context': [['headline', 'Headline', 'dl-headline']],
+  'scene-story': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['status_label', 'Panel label', 'dl-label'], ['lead', 'Panel text', 'dl-lead']],
+  'scene-invite': [['label', 'Label', 'dl-label'], ['headline', 'Headline', 'dl-headline'], ['cta', 'Call to action', 'dl-cta'], ['status', 'Status', 'dl-status']],
 };
 
 function target() { return spec.frames ? spec.frames[frameSel] : spec; }
@@ -113,7 +111,7 @@ function buildForm() {
     }))));
   }
   const footVal = spec.content?.footer_label ?? '';
-  form.append(el('label', {}, 'Footer label', el('input', { list: 'dl-labels', value: footVal, oninput: e => { spec.content ||= {}; spec.content.footer_label = e.target.value; changed(); } })));
+  form.append(el('label', {}, 'Footer label', el('input', { list: 'dl-label', value: footVal, oninput: e => { spec.content ||= {}; spec.content.footer_label = e.target.value; changed(); } })));
 
   if (!['type-led', 'signal-grid', 'scene-invite'].includes(layout)) {
     const ph = t.photo === undefined ? spec.photo : t.photo;
@@ -177,7 +175,7 @@ function rerender() {
       const canvas = document.createElement('canvas');
       try {
         const result = render(canvas, brand, fr, fmt);
-        outputs.push({ name: spec.frames ? `${fmt}-${String(fr.frameIndex + 1).padStart(2, '0')}` : fmt, fmt, frameIndex: fr.frameIndex, canvas, result, report: validateFrame(result, canvas, brand) });
+        outputs.push({ name: spec.frames ? `${fmt}-${String(fr.frameIndex + 1).padStart(2, '0')}` : fmt, fmt, layout: fr.layout, frameIndex: fr.frameIndex, canvas, result, report: validateFrame(result, canvas, brand) });
       } catch (e) {
         outputs.push({ name: fmt, fmt, frameIndex: fr.frameIndex, canvas, error: e.message, report: { status: 'fail', checks: [{ id: 'render', title: 'Render', status: 'fail', detail: e.message, boxes: [] }] } });
       }
@@ -230,13 +228,25 @@ function showSelected() {
   $('#checks').replaceChildren(...o.report.checks.map(c => el('li', { class: c.status },
     el('span', { class: 'i' }, ICON[c.status]),
     el('div', {}, c.title, c.page ? el('span', { class: 'muted' }, ` · guide p${String(c.page).padStart(2, '0')}`) : null,
-      el('small', {}, c.detail), c.gate ? el('span', { class: 'gate' }, `→ ${c.gate}`) : null))));
+      el('small', {}, c.detail), c.gate ? el('span', { class: 'gate' }, `→ ${c.gate}`) : null,
+      fixButtons(c.status === 'pass' ? [] : fixer.forCheck(c, o))))));
+}
+
+function fixButtons(fixes) {
+  if (!fixes.length) return null;
+  return el('div', { class: 'fixes' }, el('span', { class: 'fixhead' }, 'Fix:'), fixes.map(f => el('button', {
+    class: 'fix', onclick: async e => {
+      e.currentTarget.disabled = true;
+      const msg = await f.run();
+      if (msg) $('#notes').textContent = msg;
+    },
+  }, f.hint ? el('small', {}, `${f.hint} `) : null, f.label)));
 }
 
 function renderCopyChecks(copy) {
   $('#copyChecks').replaceChildren(...copy.checks.map(c => el('li', { class: c.status },
     el('span', { class: 'i' }, ICON[c.status]),
-    el('div', {}, c.title, el('small', {}, c.detail), c.gate ? el('span', { class: 'gate' }, `→ ${c.gate}`) : null))));
+    el('div', {}, c.title, el('small', {}, c.detail), c.gate ? el('span', { class: 'gate' }, `→ ${c.gate}`) : null, fixButtons(fixer.forCopy(c))))));
   const cap = copy.checks.find(c => c.id === 'caption');
   $('#captionView').replaceChildren(...(cap?.sentences || []).flatMap(s => [el('span', { class: `s ${s.status}`, title: s.reason || 'approved' }, s.text), ' ']));
 }
@@ -305,6 +315,11 @@ window.studio = { get spec() { return spec; }, get outputs() { return outputs; }
 // ---------- boot (last, so every declaration above is initialised) ----------
 brand = await loadBrand('..');
 approved = approvedSet(brand.copy);
+fixer = makeFixer({
+  brand, getSpec: () => spec, targetFor: i => (spec.frames ? spec.frames[i] : spec),
+  commit: rebuild => { if (rebuild) buildForm(); rerender(); },
+  setBusy: msg => { $('#notes').textContent = msg; },
+});
 buildDatalists();
 $('#preset').addEventListener('change', e => e.target.value === 'new' ? newBrief() : loadPreset(e.target.value));
 $('#draft').addEventListener('click', draft);
@@ -314,5 +329,5 @@ $('#applyJson').addEventListener('click', () => {
 $('#showOverlay').addEventListener('change', showSelected);
 $('#export').addEventListener('click', exportZip);
 const fromHash = new URLSearchParams(location.hash.slice(1)).get('spec');
-if (fromHash) $('#preset').value = fromHash;
-await loadPreset($('#preset').value === 'new' ? 'specs/d1-early-access.json' : $('#preset').value);
+if (fromHash && [...$('#preset').options].some(o => o.value === fromHash)) $('#preset').value = fromHash;
+await loadPreset(fromHash || ($('#preset').value === 'new' ? 'specs/d1-early-access.json' : $('#preset').value));

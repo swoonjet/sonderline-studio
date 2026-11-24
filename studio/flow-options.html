@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>flow options</title><meta name="robots" content="noindex"></head>
+<body style="margin:0">
+<script type="module">
+  // Renders flow-graphic options for review: swatches per colourway + the D2 cover and closer.
+  import { loadBrand } from './js/brand.js';
+  import { frames, render, renderFlowSwatch } from './js/engine.js';
+  const brand = await loadBrand('..');
+  const d2 = await fetch('specs/d2-site-signals.json').then(r => r.json());
+  const out = {};
+  for (const style of ['bars', 'lanes', 'converge', 'supergraphic', 'contour']) {
+    out[style] = { swatches: {}, frames: {} };
+    for (const cw of ['lavender', 'black', 'coolgrey', 'white']) out[style].swatches[cw] = renderFlowSwatch(document.createElement('canvas'), brand, style, cw);
+    const fr = frames({ ...d2, flowStyle: style });
+    for (const i of [0, 5]) { const c = document.createElement('canvas'); render(c, brand, fr[i], 'feed'); out[style].frames[i] = c.toDataURL('image/png'); }
+  }
+  window.__flows = out;
+</script></body></html>

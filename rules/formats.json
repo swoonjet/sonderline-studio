@@ -8,7 +8,8 @@
     "photo": 0.586667,
     "info": 0.28,
     "headlineW": 0.72,
-    "headlineLines": 2
+    "headlineLines": 3,
+    "footer": 0.133333
   },
   "square": {
     "label": "Feed square 1:1",
@@ -18,7 +19,8 @@
     "photo": 0.52,
     "info": 0.31,
     "headlineW": 0.72,
-    "headlineLines": 2
+    "headlineLines": 3,
+    "footer": 0.17
   },
   "link": {
     "label": "Link / ad card 1.91:1",
@@ -28,7 +30,8 @@
     "photo": 0.555,
     "info": 0.3,
     "headlineW": 0.62,
-    "headlineLines": 2
+    "headlineLines": 2,
+    "footer": 0.145
   },
   "story": {
     "label": "Story / Reel cover 9:16",
@@ -52,6 +55,7 @@
     "photo": 0.62,
     "info": 0.24,
     "headlineW": 0.6,
-    "headlineLines": 2
+    "headlineLines": 2,
+    "footer": 0.14
   }
 }
