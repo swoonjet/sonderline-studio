@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pulse Social Studio</title>
+<link rel="stylesheet" href="css/studio.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><img src="../brand-kit/assets/sonderline_symbol_black.svg" alt="" class="sym"><strong>Pulse Social Studio</strong><span class="muted">Sonderline Social System · prototype</span></div>
+  <nav><a href="../">Overview</a><a href="../docs/">System</a><a href="../deliverables/">Deliverables</a></nav>
+</header>
+
+<ol class="steps" aria-label="Workflow">
+  <li><b>1</b> Brief</li><li><b>2</b> Spec</li><li><b>3</b> Render</li><li><b>4</b> Check</li><li><b>5</b> Approve &amp; export</li>
+</ol>
+
+<main class="grid">
+  <!-- 1 + 2: brief and spec -->
+  <section class="col left">
+    <h2><b>1</b> Brief</h2>
+    <label>Start from
+      <select id="preset">
+        <option value="specs/d1-early-access.json">D1 · Early-access launch post</option>
+        <option value="specs/d2-site-signals.json">D2 · Site signals carousel</option>
+        <option value="specs/r1-v1-draft.json">Review example · first draft (v1)</option>
+        <option value="specs/r1-v2-autofix.json">Review example · auto-fixed (v2)</option>
+        <option value="specs/r1-v3-approved.json">Review example · designer refined (v3)</option>
+        <option value="new">New brief…</option>
+      </select>
+    </label>
+    <div class="row2">
+      <label>Requester<input id="requester" placeholder="e.g. Product marketing"></label>
+      <label>Channel<input id="channel" placeholder="e.g. LinkedIn organic"></label>
+    </div>
+    <label>Brief<textarea id="brief" rows="5" placeholder="What is this for, who is it for, which channels?"></textarea></label>
+    <details id="keybox">
+      <summary>Claude API key <span class="muted">(optional, for live drafting)</span></summary>
+      <input id="apikey" type="password" autocomplete="off" placeholder="sk-ant-…">
+      <p class="fine">Kept in this tab's memory only: never stored or sent anywhere except api.anthropic.com. Without a key, the rules-based offline drafter is used.</p>
+    </details>
+    <button id="draft" class="primary">Draft spec</button>
+    <p id="draftStatus" class="fine" role="status"></p>
+
+    <h2><b>2</b> Spec</h2>
+    <div id="frameNav" class="frames" hidden></div>
+    <div id="specForm"></div>
+    <details>
+      <summary>Spec JSON</summary>
+      <textarea id="json" rows="14" spellcheck="false"></textarea>
+      <button id="applyJson">Apply JSON</button>
+    </details>
+  </section>
+
+  <!-- 3: render -->
+  <section class="col mid">
+    <h2><b>3</b> Render <span class="muted" id="renderMeta"></span></h2>
+    <div class="stage">
+      <div class="stageInner"><canvas id="big"></canvas><canvas id="overlay" aria-hidden="true"></canvas></div>
+    </div>
+    <div class="stageBar">
+      <label class="check"><input type="checkbox" id="showOverlay" checked> Show issues on the artwork</label>
+      <span id="notes" class="fine"></span>
+    </div>
+    <div id="thumbs" class="thumbs"></div>
+  </section>
+
+  <!-- 4 + 5: check and approve -->
+  <section class="col right">
+    <h2><b>4</b> Check <span id="overall" class="chip"></span></h2>
+    <ul id="checks" class="checks"></ul>
+    <h3>Caption &amp; alt text</h3>
+    <ul id="copyChecks" class="checks"></ul>
+    <div id="captionView" class="caption"></div>
+
+    <h2><b>5</b> Approve &amp; export</h2>
+    <div id="gates"></div>
+    <button id="export" class="primary" disabled>Export approved set (.zip)</button>
+    <p id="exportStatus" class="fine"></p>
+  </section>
+</main>
+
+<footer class="foot fine">Prototype by Jon Toews for SketchDeck. Sonderline is fictional. Photography supplied with the brand kit is AI-generated. Inter Tight, SIL OFL 1.1. The flow graphic is an assumed stand-in.</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

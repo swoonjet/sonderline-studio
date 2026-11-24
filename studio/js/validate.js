@@ -30,6 +30,18 @@ export function sentences(text) {
   return norm(text).split(/(?<=[.!?])\s+/).filter(Boolean);
 }
 
+// Sentences, re-joined where consecutive sentences form one approved line ("Every site. One view.").
+export function copyUnits(text, approved) {
+  const s = sentences(text), out = [];
+  for (let i = 0; i < s.length;) {
+    let j = s.length;
+    while (j > i + 1 && !approved.has(s.slice(i, j).join(' '))) j--;
+    out.push(s.slice(i, j).join(' '));
+    i = j;
+  }
+  return out;
+}
+
 const intersects = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 const inside = (a, W, H) => a.x >= -0.5 && a.y >= -0.5 && a.x + a.w <= W + 0.5 && a.y + a.h <= H + 0.5;
 
@@ -184,7 +196,7 @@ export function validateSpecCopy(spec, brand) {
   const checks = [];
   const approved = approvedSet(brand.copy);
   if (spec.caption) {
-    const res = sentences(spec.caption).map(s => ({ s, r: checkCopy(s, brand.copy, approved) }));
+    const res = copyUnits(spec.caption, approved).map(s => ({ s, r: checkCopy(s, brand.copy, approved) }));
     const bad = res.filter(x => x.r.status === 'fail'), rev = res.filter(x => x.r.status === 'review');
     checks.push({
       id: 'caption', title: 'Caption uses approved claims', page: 13,

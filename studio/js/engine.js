@@ -21,7 +21,10 @@ export function render(canvas, brand, frame, formatId) {
   const f = brand.formats[formatId];
   if (!f) throw new Error(`Unknown format "${formatId}"`);
   canvas.width = f.w; canvas.height = f.h;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  // a designer can override the crop per format (portrait and landscape rarely want the same crop)
+  const ov = frame.photo && frame.photoOverrides?.[formatId];
+  if (ov) frame = { ...frame, photo: { ...frame.photo, ...ov } };
   const R = new Renderer(ctx, brand, f, frame);
   const layout = LAYOUTS[frame.layout];
   if (!layout) throw new Error(`Unknown layout "${frame.layout}"`);
