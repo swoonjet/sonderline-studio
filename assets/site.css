@@ -100,3 +100,13 @@ footer.foot { padding: 28px var(--m) 40px; font-size: 13px; color: var(--muted);
   .bar nav, .cta-row { display: none; }
   section.block { break-inside: avoid; }
 }
+
+.copy-check { font-size: 14px; line-height: 1.5; background: var(--panel); padding: 10px 12px; margin-top: 10px; }
+.copy-check p { margin: 0 0 6px; }
+.copy-check .ck-label { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 6px 0 2px; }
+.copy-check mark { padding: 1px 2px; color: inherit; }
+.copy-check mark.fail { background: var(--fail-bg); text-decoration: line-through; text-decoration-color: var(--fail); }
+.copy-check mark.review { background: var(--review-bg); }
+.copy-check mark.ok { background: var(--pass-bg); }
+.ck-tag { font-size: 11px; font-weight: 700; white-space: nowrap; }
+.ck-tag.fail { color: var(--fail); } .ck-tag.review { color: var(--review); } .ck-tag.ok { color: var(--pass); }
