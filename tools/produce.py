@@ -7,11 +7,8 @@ and browser output are pixel-identical.
 """
 import argparse
 import base64
-import functools
-import http.server
 import json
 import pathlib
-import threading
 
 from PIL import Image, ImageDraw, ImageFont
 from playwright.sync_api import sync_playwright
@@ -20,13 +17,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
 def serve():
-    class Quiet(http.server.SimpleHTTPRequestHandler):
-        def log_message(self, *a):
-            pass
-    handler = functools.partial(Quiet, directory=str(ROOT))
-    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
-    threading.Thread(target=httpd.serve_forever, daemon=True).start()
-    return httpd
+    from serve import serve as _serve
+    return _serve()
 
 
 def annotate(png_path, report, out_path):

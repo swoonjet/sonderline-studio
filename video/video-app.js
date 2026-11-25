@@ -4,6 +4,7 @@ import { REQUIRED } from '../studio/js/engine.js';
 import { checkCopy, approvedSet } from '../studio/js/validate.js';
 import { MotionRenderer, timeline } from '../studio/js/motion.js';
 import { makeFixer, candidates } from '../studio/js/fixes.js';
+import { canExportMp4, exportMp4 } from './export-mp4.js';
 
 const $ = s => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => {
@@ -72,9 +73,21 @@ async function videoFor(i, name) {
   if (!videos[key]) {
     const v = document.createElement('video');
     v.muted = true; v.playsInline = true; v.preload = 'auto'; v.loop = false;
-    v.src = `../${clips[name].file}`;
+    // H.264 MP4 plays in every current browser (Safari has no reliable VP9); WebM is the fallback
+    const mp4 = v.canPlayType('video/mp4; codecs="avc1.640028"');
+    v.src = `../${mp4 ? clips[name].file.replace(/\.webm$/, '.mp4') : clips[name].file}`;
     videos[key] = v;
-    await new Promise(res => { if (v.readyState >= 2) res(); else v.addEventListener('loadeddata', res, { once: true }); });
+    await new Promise((res, rej) => {
+      if (v.readyState >= 2) return res();
+      v.addEventListener('loadeddata', res, { once: true });
+      v.addEventListener('error', () => { delete videos[key]; rej(new Error(`This browser could not load the footage clip "${name}".`)); }, { once: true });
+    });
+    // Chromium only refreshes a paused video's frame after a seek if the element is in the page and has played once
+    v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none';
+    v.setAttribute('aria-hidden', 'true');
+    document.body.append(v);
+    try { await v.play(); } catch {}
+    v.pause();
   }
   return videos[key];
 }
@@ -131,6 +144,9 @@ async function refresh() {
     renderGates();
     T = Math.min(T, tl.total);
     await draw();
+  } catch (e) {
+    $('#exportStatus').textContent = e.message;
+    throw e;
   } finally { busy = false; }
 }
 
@@ -302,7 +318,7 @@ function renderGates() {
   $('#record').disabled = !ready;
   if (blocked) $('#exportStatus').textContent = 'Blocked: fix the failing checks before anyone can approve.';
   else if (!ready) $('#exportStatus').textContent = `Needs approval from: ${gates.filter(g => !approvals[g.id]).map(g => g.who).join(', ')}.`;
-  else $('#exportStatus').textContent = 'Ready to record.';
+  else $('#exportStatus').textContent = 'Ready to export.';
 }
 
 // ---------- playback ----------
@@ -371,8 +387,37 @@ function stop() {
 async function seek(t) { const was = playing; stop(); T = Math.max(0, Math.min(mr.tl.total - 1e-3, t)); await draw(); if (was) play(); }
 
 // ---------- export ----------
+function saveOutputs(blob, ext) {
+  const a = el('a', { href: URL.createObjectURL(blob), download: `${spec.id}.${ext}` });
+  document.body.append(a); a.click(); a.remove();
+  const log = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify({ spec, report, approvals: Object.values(approvals), exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' })), download: `${spec.id}-approvals.json` });
+  document.body.append(log); log.click(); log.remove();
+}
+
 async function record() {
-  stop(); T = 0; await draw();
+  stop(); T = 0;
+  // frame-exact export where the browser has WebCodecs (current Chrome, Edge, Safari and Firefox)
+  if (canExportMp4()) {
+    $('#record').disabled = true;
+    try {
+      const music = spec.music ? await audioFor(spec.music) : null;
+      const { blob, audio } = await exportMp4({
+        mr, screen, music,
+        onProgress: f => { $('#exportStatus').textContent = `Rendering frame by frame… ${Math.round(f * 100)}%`; present(); },
+      });
+      saveOutputs(blob, 'mp4');
+      const note = audio.startsWith('none') && spec.music ? ', without music: this browser cannot encode audio'
+        : audio === 'opus' ? '. This browser encodes the music as Opus, which some social platforms reject; export from Chrome, Edge or Safari for AAC' : '';
+      $('#exportStatus').textContent = `Saved ${spec.id}.mp4 (${(blob.size / 1e6).toFixed(1)} MB) and its approval record${note}.`;
+      window.__lastExport = { size: blob.size, audio };
+      await draw();
+      return;
+    } catch (e) {
+      console.warn('Frame-exact export failed, recording in real time instead:', e);
+      $('#exportStatus').textContent = `Frame-by-frame export failed (${e.message}). Recording in real time instead…`;
+    } finally { $('#record').disabled = false; }
+  }
+  await draw();
   const stream = screen.captureStream(mr.fps);
   actx ||= new AudioContext();
   const dest = actx.createMediaStreamDestination();
@@ -386,10 +431,7 @@ async function record() {
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
   rec.onstop = () => {
     const ext = mime.startsWith('video/mp4') ? 'mp4' : 'webm';
-    const a = el('a', { href: URL.createObjectURL(new Blob(chunks, { type: mime.split(';')[0] })), download: `${spec.id}.${ext}` });
-    document.body.append(a); a.click(); a.remove();
-    const log = el('a', { href: URL.createObjectURL(new Blob([JSON.stringify({ spec, report, approvals: Object.values(approvals), exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' })), download: `${spec.id}-approvals.json` });
-    document.body.append(log); log.click(); log.remove();
+    saveOutputs(new Blob(chunks, { type: mime.split(';')[0] }), ext);
     $('#exportStatus').textContent = `Saved ${spec.id}.${ext} and its approval record.`;
     $('#record').disabled = false;
   };

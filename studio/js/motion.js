@@ -114,8 +114,17 @@ export class MotionRenderer {
       return;
     }
     if (this.media.live) { if (Math.abs(el.currentTime - t) > 0.12) el.currentTime = t; if (el.paused) el.play().catch(() => {}); return; }
-    if (Math.abs(el.currentTime - t) < 1 / (this.fps * 4) && el.readyState >= 2) return;
-    await new Promise(res => { el.addEventListener('seeked', res, { once: true }); el.currentTime = t; });
+    // aim at the middle of the clip frame (24 fps) so rounding never lands on the previous frame
+    const target = Math.min((Math.floor(t * 24) + 0.5) / 24, (el.duration || Infinity) - 0.02);
+    if (Math.abs(el.currentTime - target) < 1 / 96 && el.readyState >= 2) return;
+    // 'seeked' fires before Chrome has the new frame ready to draw; requestVideoFrameCallback fires once it is
+    await new Promise(res => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; res(); } };
+      if (el.requestVideoFrameCallback) el.requestVideoFrameCallback(finish);
+      el.addEventListener('seeked', () => { if (!el.requestVideoFrameCallback) finish(); else setTimeout(finish, 400); }, { once: true });
+      el.currentTime = target;
+    });
   }
 
   // Solve the scrim once per photo scene (strong enough for the start, middle and end of the clip),

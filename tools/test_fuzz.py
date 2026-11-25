@@ -4,13 +4,10 @@ Fails if anything throws or a failing output has no working fix.
 
     python tools/test_fuzz.py
 """
-import functools, http.server, threading, pathlib, time, collections, sys
+import time, collections, sys
 from playwright.sync_api import sync_playwright
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-class Q(http.server.SimpleHTTPRequestHandler):
-    def log_message(self,*a): pass
-httpd = http.server.ThreadingHTTPServer(('127.0.0.1',0), functools.partial(Q, directory=str(ROOT)))
-threading.Thread(target=httpd.serve_forever, daemon=True).start()
+from serve import serve
+httpd = serve()
 tot=collections.Counter(); exc=[]; unf=[]
 with sync_playwright() as p:
     b=p.chromium.launch(); pg=b.new_page(); pg.set_default_timeout(900000)

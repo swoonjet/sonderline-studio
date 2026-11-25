@@ -48,7 +48,7 @@ The three Studios are static web pages. Anyone on the team can use them at the l
 
 - **Claude drafting** is optional. Paste an Anthropic API key into the Studio's "Claude API key" field. The key stays in memory for that tab and goes only to api.anthropic.com. Without a key, the offline drafter is used and everything else works.
 - **Exports** (PNG zip, MP4 video, PowerPoint, PDF) are made in the browser and downloaded directly.
-- **Video recording** uses the browser's MediaRecorder: MP4 in Chrome, Edge and Safari, WebM in Firefox.
+- **Video export** renders the video frame by frame in the browser (WebCodecs) and saves an H.264 MP4 with the music, so the result doesn't depend on the computer's speed. Current Chrome, Edge, Safari and Firefox all support it; Chrome, Edge and Safari write AAC audio, and Firefox writes Opus, which some social platforms reject. Older browsers fall back to recording in real time.
 
 ## Dependencies
 **Web (loaded by the pages, nothing to install)**
@@ -78,7 +78,7 @@ git clone https://github.com/swoonjet/sonderline-studio.git && cd sonderline-stu
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt && python -m playwright install chromium
 
-python3 -m http.server 8000                                         # Studios at http://localhost:8000/studio/, /video/, /deck/
+python tools/serve.py                                                # Studios at http://localhost:8000/studio/, /video/, /deck/
 python tools/produce.py studio/specs/d1-early-access.json --strict    # stills: PNGs + check report + caption (exit 1 on FAIL)
 python tools/produce_deck.py studio/specs/d6-pilot-deck.json          # deck: PNGs + editable .pptx + .pdf
 python tools/produce_video.py studio/specs/d4-launch-video.json       # video: MP4 with music (needs ffmpeg)

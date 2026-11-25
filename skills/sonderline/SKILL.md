@@ -47,10 +47,10 @@ python tools/test_fuzz.py         # 3,600 random renders, expect 0 exceptions an
 
 ## Interactive tools (for people)
 - `studio/` Social Studio: brief, spec, renders, checks, approvals, zip.
-- `video/` Video Studio: scenes in beats, preview with music, MP4 recording.
+- `video/` Video Studio: scenes in beats, preview with music, frame-by-frame MP4 export.
 - `deck/` Deck Studio: slides, notes, editable PowerPoint and PDF.
 
-Serve locally with `python3 -m http.server 8000` from the project root.
+Serve locally with `python tools/serve.py` from the project root (it supports range requests, which video seeking needs; `python -m http.server` does not).
 
 ## Figma
 `figcraft/sonderline-brand-kit.figcraft`: foundations (colour variables, Inter Tight text styles, logo and clearspace), components (logo set, footer bar, info row variants, CTA, signal item, photo frame, Contour), templates at real sizes, and examples. Rebuild it headless with `python3 figcraft/build_kit.py --fresh` (close the file in FigCraft first). Open it with `figcraft/start.sh`.
