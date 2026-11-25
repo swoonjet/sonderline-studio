@@ -96,6 +96,11 @@ footer.foot { padding: 28px var(--m) 40px; font-size: 13px; color: var(--muted);
   .steps3 { grid-template-columns: 1fr; }
   .gallery img, .strip img { height: 280px; }
 }
+@media (max-width: 600px) {
+  .status { white-space: normal; }
+  .gallery figure { max-width: 100%; }
+  .gallery img, .gallery video { max-width: 100%; height: auto !important; }
+}
 @media print {
   .bar nav, .cta-row { display: none; }
   section.block { break-inside: avoid; }
