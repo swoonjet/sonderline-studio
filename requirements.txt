@@ -1,0 +1,4 @@
+# Command-line tools (tools/*.py). Python 3.10 or newer.
+# After installing: python -m playwright install chromium
+playwright>=1.48
+pillow>=10

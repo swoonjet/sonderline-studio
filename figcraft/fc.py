@@ -38,7 +38,7 @@ class FC:
         return self.ex("command.batch", {"commands": commands})
 
 
-CLI = os.path.expanduser("~/.local/opt/figcraft-cli/figcraft-cli-0.18.1-macos-universal/figcraft-cli")
+CLI = os.environ.get("FIGCRAFT_CLI") or os.path.expanduser("~/.local/opt/figcraft-cli/figcraft-cli-0.18.1-macos-universal/figcraft-cli")
 
 
 class FCHeadless:

@@ -1,0 +1,36 @@
+name: checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Stills (D1)
+        run: python tools/produce.py studio/specs/d1-early-access.json --out out/ci --strict
+      - name: Regression matrix
+        run: python tools/test_regression.py
+      - name: Fuzz
+        run: python tools/test_fuzz.py
+      - name: Deck export (D6)
+        run: python tools/produce_deck.py studio/specs/d6-pilot-deck.json --out out/ci
+      - name: Video render (D5)
+        run: python tools/produce_video.py studio/specs/d5-signals-reel.json --out out/ci
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: outputs
+          path: out/ci
+          retention-days: 7

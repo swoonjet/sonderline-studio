@@ -1,7 +1,7 @@
 """Deck production: deck spec -> editable PowerPoint (.pptx), PDF and slide PNGs, using the Deck Studio's
 own exporter in headless Chromium.
 
-    ~/.venvs/playwright/bin/python tools/produce_deck.py studio/specs/d6-pilot-deck.json [--out deliverables]
+    python tools/produce_deck.py studio/specs/d6-pilot-deck.json [--out deliverables]
 """
 import argparse
 import base64

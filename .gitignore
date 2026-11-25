@@ -11,7 +11,6 @@ walkthrough/*.mov
 # private working notes (plan, brief copy, time log), never published
 _notes/
 out/
-studio/specs/_matrix/
 assets/video/raw/
 assets/video/hq/
 __pycache__/

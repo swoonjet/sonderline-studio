@@ -7,7 +7,7 @@ description: Make, check or plan Sonderline brand assets (social posts in any fo
 
 Sonderline is a fictional enterprise operations brand (supplied by SketchDeck). Its product is **Sonderline Pulse**. Everything is produced by one system: brand rules as data, a canvas layout engine, an automated checker, and named human approval.
 
-Project: `~/Projects/sonderline-pulse-studio` (live at https://jontoews.com/sonderline-studio/). Run commands from the project root.
+Project: a clone of https://github.com/swoonjet/sonderline-studio (live at https://jontoews.com/sonderline-studio/). On Jon's machine it is `~/Projects/sonderline-pulse-studio`. Run commands from the project root. First-time setup: `pip install -r requirements.txt && python -m playwright install chromium`, plus ffmpeg for video.
 
 ## Rules that never bend
 1. **Copy comes from `rules/copy-library.json`.** Never invent capabilities, performance numbers, customer names or testimonials (guide p13). If a brief needs a line the library doesn't have, use the closest approved line and tell the user the gap is for product marketing. Pulse is pre-launch: "Early-access pilots planned for Q1 2027."
@@ -32,16 +32,17 @@ Video timing: music excerpts in `assets/music/tracks.json` start on a bar line (
 
 ## Produce and check
 ```bash
-~/.venvs/playwright/bin/python tools/produce.py studio/specs/<spec>.json [--out out/<dir>]      # stills, carousels, slides: PNGs + report.json + caption.md
-~/.venvs/playwright/bin/python tools/produce_deck.py studio/specs/<deck>.json                     # + editable .pptx and .pdf
-~/.venvs/playwright/bin/python tools/produce_video.py studio/specs/<video>.json                   # MP4 with music, per-scene checks
+python tools/produce.py studio/specs/<spec>.json [--out out/<dir>]      # stills, carousels, slides: PNGs + report.json + caption.md
+python tools/produce_deck.py studio/specs/<deck>.json                     # + editable .pptx and .pdf
+python tools/produce_video.py studio/specs/<video>.json                   # MP4 with music, per-scene checks
 python3 tools/stamp_media.py                                                                       # after replacing media on the site
 ```
 Every output gets a check report: **pass**, **review** (names who decides: designer, product marketing or brand lead) or **fail** (blocked). Fix failures through the spec, for example a shorter approved line, another layout, or a different crop or clip. The Studios offer one-click versions of these fixes. Look at every render yourself before calling it done.
 
-Regression before publishing engine changes:
+Tests before publishing engine changes (both exit non-zero on failure; CI runs them on every push):
 ```bash
-~/.venvs/playwright/bin/python tools/produce.py studio/specs/_matrix/m-*.json --out out/matrix   # 420 renders, expect 0 FAIL
+python tools/test_regression.py   # 84 specs, 420 renders, expect 0 FAIL
+python tools/test_fuzz.py         # 3,600 random renders, expect 0 exceptions and 0 unfixable
 ```
 
 ## Interactive tools (for people)

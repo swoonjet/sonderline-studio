@@ -3,7 +3,7 @@
     python3 tools/gen_video_assets.py submit     # crop the stills, submit one job per clip
     python3 tools/gen_video_assets.py collect    # poll, download, transcode to WebM (VP9) for the engine
 
-The key is read from the ComfyUI OpenRouter node's key file and never printed or stored here.
+The key comes from OPENROUTER_API_KEY, or else the ComfyUI OpenRouter node's key file. It is never printed or stored here.
 Every clip starts from a supplied photograph as its first frame; prompts keep the kit's photo
 direction (monochrome silver, partial human presence, no faces, no text). Clips are AI-generated
 derivatives of AI-generated stills: disclose them as such.
@@ -11,6 +11,7 @@ derivatives of AI-generated stills: disclose them as such.
 import base64
 import io
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -53,6 +54,8 @@ CLIPS = {
 
 
 def key():
+    if os.environ.get("OPENROUTER_API_KEY"):
+        return os.environ["OPENROUTER_API_KEY"]
     data = json.loads(KEY_FILE.read_text())
     return data.get("api_key") or next(iter(data.values()))
 

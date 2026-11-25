@@ -1,6 +1,6 @@
 """Video production: video spec -> MP4 (H.264 + AAC music) via the motion engine, frame by frame.
 
-    ~/.venvs/playwright/bin/python tools/produce_video.py studio/specs/d4-launch-video.json [--out deliverables]
+    python tools/produce_video.py studio/specs/d4-launch-video.json [--out deliverables]
 
 Writes <out>/<id>/<id>.mp4, a poster (held frame) per scene, and a validation report in which
 every scene was checked at the start, middle and end of its move.

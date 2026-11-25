@@ -3,7 +3,7 @@
 Uses the same engine as the web studio (studio/render.html in headless Chromium), so CLI
 and browser output are pixel-identical.
 
-    ~/.venvs/playwright/bin/python tools/produce.py studio/specs/d1-early-access.json [more specs...] [--out deliverables]
+    python tools/produce.py studio/specs/d1-early-access.json [more specs...] [--out deliverables]
 """
 import argparse
 import base64
@@ -54,6 +54,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("specs", nargs="+")
     ap.add_argument("--out", default="deliverables")
+    ap.add_argument("--strict", action="store_true", help="exit with status 1 if any output fails its checks")
     args = ap.parse_args()
     httpd = serve()
     port = httpd.server_address[1]
@@ -91,6 +92,8 @@ def main():
         browser.close()
     httpd.shutdown()
     print(f"\nOverall: {worst.upper()}")
+    if args.strict and worst == "fail":
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
