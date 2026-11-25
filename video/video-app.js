@@ -66,6 +66,7 @@ function present() {
 }
 window.addEventListener('resize', () => present());
 const videos = {};          // `${sceneIndex}:${clip}` -> <video>
+const clipUrls = {};        // clip URL -> promise of an object URL for the downloaded file
 
 // ---------- footage ----------
 async function videoFor(i, name) {
@@ -75,7 +76,10 @@ async function videoFor(i, name) {
     v.muted = true; v.playsInline = true; v.preload = 'auto'; v.loop = false;
     // H.264 MP4 plays in every current browser (Safari has no reliable VP9); WebM is the fallback
     const mp4 = v.canPlayType('video/mp4; codecs="avc1.640028"');
-    v.src = `../${mp4 ? clips[name].file.replace(/\.webm$/, '.mp4') : clips[name].file}`;
+    const url = `../${mp4 ? clips[name].file.replace(/\.webm$/, '.mp4') : clips[name].file}`;
+    // download each clip once and seek it from memory: seeking over the network is slow on a hosted site
+    clipUrls[url] ||= fetch(url).then(r => { if (!r.ok) throw new Error(`Could not download the footage clip "${name}".`); return r.blob(); }).then(b => URL.createObjectURL(b));
+    v.src = await clipUrls[url];
     videos[key] = v;
     await new Promise((res, rej) => {
       if (v.readyState >= 2) return res();
