@@ -12,7 +12,7 @@
 html, body { margin: 0; background: var(--white); color: var(--black); }
 body { font: 17px/1.5 "Inter Tight", system-ui, sans-serif; }
 a { color: inherit; text-underline-offset: 3px; }
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 
 .bar { display: flex; justify-content: space-between; align-items: center; padding: 14px var(--m); border-bottom: 1px solid var(--line); gap: 12px; flex-wrap: wrap; }
 .bar .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; }
